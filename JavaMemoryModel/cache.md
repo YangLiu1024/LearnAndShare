@@ -29,15 +29,17 @@ Index 用来寻找 set, block offset 用来寻找该行中的具体字节，剩�
 
 ## write policy
 CPU write data to cache 后， 必须在之后某个时间点将 data 同步到主存，这个时间点的选择称为 write policy.
-a. write-through: 同时写入 cache 和主存
-b. write-back: 先写入 cache, 标记该 cache line dirty, 在该 cache entry 将被 replace 或者其它系统安排的时间点写回主存
-c. write-allocate: write/read miss 后，创建 cache entry, load data, 然后继续操作。 
-d. no-write-allocate: write miss 后，并不创建cache entry, 而是直接写回主存。read miss 后，会创建cache entry.
+1. write-through: 同时写入 cache 和主存
+2. write-back: 先写入 cache, 标记该 cache line dirty, 在该 cache entry 将被 replace 或者其它系统安排的时间点写回主存
+3. write-allocate: write/read miss 后，创建 cache entry, load data, 然后继续操作。 
+4. no-write-allocate: write miss 后，并不创建cache entry, 而是直接写回主存。read miss 后，会创建cache entry.
+![](image/write-through.png)
+![](image/write-back.png)
 
 一般, write-back 会使用 write-allocate 模式处理 write miss, write-through 会使用 no-write-allocate 模式处理 write miss
 需要注意的是，在多处理器中，对共享变量的 write 也有不同的处理方式。
-a. write-invalidate: 对当前处理器的 write 会广播给其它处理器，并让其它处理器标记含有该共享变量的 cache entry 为 invalid, 则其它处理器在下一次访问该 cache entry时，需要从主存中重新 load(也可以从别的 cache 中读取，具体方式取决于缓存一致性的实现， 比如 MESI， P1 的 write 只写回 cache, P2 可以发消息直接从 P1 的cache 中读取 cache line)
-b. write-update: 对当前处理器的写会广播给其它处理器，且直接更新该处理器里共享变量的值
+1. write-invalidate: 对当前处理器的 write 会广播给其它处理器，并让其它处理器标记含有该共享变量的 cache entry 为 invalid, 则其它处理器在下一次访问该 cache entry时，需要从主存中重新 load(也可以从别的 cache 中读取，具体方式取决于缓存一致性的实现， 比如 MESI， P1 的 write 只写回 cache, P2 可以发消息直接从 P1 的cache 中读取 cache line)
+2. write-update: 对当前处理器的写会广播给其它处理器，且直接更新该处理器里共享变量的值
 
 ## cache coherence
 当不同处理器 cache 了相同 cache line 时，其中一个处理器对共享变量的修改，该怎么对其它处理器可见，这是缓存一致性协议所负责的事情。
