@@ -43,8 +43,8 @@ An example to show how MESI works
 6. P3 发出 PrRd, 发现自己 cache entry 是 S, 则直接读取返回
 7. P2 发出 PrRd, 然后发出 BusRd, P1 或者 P3 接收到这个事件，将自己的 cache entry 发给 P2
 
-MESI protocol 也有自己的缺点， 当 write/read invalid cache entry 时，需要等待很久，去查询其它 core 中该cache entry 的状态。 并且当需要 invalidate cache entry in other cores, 也需要花费很长时间。
-为了解决这些问题， 可以引入 store buffer 和 invalidate queue
+MESI protocol 也有自己的缺点， 当 write/read invalid cache entry 时，需要等待很久，去查询其它 core 中该cache entry 的状态。 并且当需要 invalidate cache entry in other cores, 也需要花费很长时间。为了解决这些问题， 引入 store buffer 和 invalidate queue
+
 ![](image/store-buffer-invalidate-queue.png)
 
 为了避免对 P1 cache line 的写入需要等待其它处理器先 invalidate 自己的cache line 再返回 ACK 信号，引入了 store buffer. P1 可以先把 write 写入 store buffer, 发出 read-invalidate 信号后继续执行之后的命令，无需等待该信号返回。这样就可以节省很多 CPU 之间通信的时间。然后异步等待其它 CPU 的响应， 当响应时，将store buffer apply to cache.
@@ -52,8 +52,10 @@ MESI protocol 也有自己的缺点， 当 write/read invalid cache entry 时，
 同理， 解决了主动发送信号端的效率问题，那么接收端 CPU 再接收到 invalidate 信号后也不是立即采取相应行动，而是把 invalidate 信号插入到一个 invalidaye queue 中，且立即返回 ACK 信号。 等待合适的时间，再去处理这个 queue 中的 invalidate.
 
 store buffer 和 invalidate queue 虽然提升了 MESI 的性能，但是也引入了其它问题。
+1. CPU 会尝试从 store buffer 中读取值，尽管它还没有提交，这个方案称之为 store forwarding.
+2. store buffer 中的写入什么时候同步到 cache, 并没有保证
+3. CPU 什么时候处理 invalidate queue 并没有保证
 
-第一， CPU 会尝试从 store buffer 中读取值，尽管它还没有提交，这个方案称之为 store forwarding.
-第二， store buffer 中的写入什么时候写入 cache, 并没有保证
+为了解决上述问题，又引入了 memory barrier
 
 
