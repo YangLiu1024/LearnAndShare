@@ -47,7 +47,7 @@ MESI protocol 也有自己的缺点， 当 write/read invalid cache entry 时，
 
 ![](image/store-buffer-invalidate-queue.png)
 
-为了避免对 P1 cache line 的写入需要等待其它处理器先 invalidate 自己的cache line 再返回 ACK 信号，引入了 store buffer. P1 可以先把 write 写入 store buffer, 发出 read-invalidate 信号后继续执行之后的命令，无需等待该信号返回。这样就可以节省很多 CPU 之间通信的时间。然后异步等待其它 CPU 的响应， 当响应时，将store buffer apply to cache.
+如果当前 core 并不own 想写入的 cache line, 即该 cache line 不在 当前core cache 里面，或者状态不为 E 或者 M, 为了写入值， 当前 core 需要发出 read-invalidate 信号来 invalidate 其它 core, 这时需要stall 来等待其它 core 的 ACK. 这样会消耗很多时间。为了避免这种情况，引入了 store buffer. 当前core 可以先把 write 写入 store buffer, 发出 read-invalidate 信号后继续执行之后的命令，无需等待该信号返回。这样就可以节省很多 CPU 之间通信的时间。然后异步等待其它 CPU 的响应， 当响应时，将store buffer apply to cache.
 
 同理， 解决了主动发送信号端的效率问题，那么接收端 CPU 再接收到 invalidate 信号后也不是立即采取相应行动，而是把 invalidate 信号插入到一个 invalidaye queue 中，且立即返回 ACK 信号。 等待合适的时间，再去处理这个 queue 中的 invalidate.
 
