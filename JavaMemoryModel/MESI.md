@@ -24,6 +24,16 @@ BusUpgr | another processor which have the entry in cache request to write the c
 Flush | an entire cache entry is written back to main memory by another processor
 Flushopt | an entire block is posted on the bus in order to supply it to another processor(cache to cache transfer)
 
+对于bus event, 有的书本也有另外一套称呼
+Event Name | Comment
+-----------| -------
+Read | another processor request to read a cache entry(same to BusRd), the message contain the physical address of the cache line
+Read Response | the message contain the data requested by an earlier Read message, its supplied by either main memory or another cache
+Invalidate | the message contain the physical address of cache line to be invalidated, all other caches need to invalidate there copies
+Invalidate Acknownledge |  A CPU recieve Invalidate message must repsond with Invalidate Acknownledge message after invalidate their copies
+Read Invalidate | the combination of Read and Invalidate
+Writeback | the message contain both the data and its physical address to be written back to memory or another CPU cache
+
 M 和 E 的状态总是精确的， 但是S不是。 当其它 S cache entry 被它们的cache discard时，它们并不会通知当前 cache, 则当前的cache entry事实上是 Exclusive，但是它的状态仍然是S。
 
 处于不同状态的 cache entry 在处理自己处理器 event 时的 response 如下表所示
@@ -43,7 +53,11 @@ An example to show how MESI works
 6. P3 发出 PrRd, 发现自己 cache entry 是 S, 则直接读取返回
 7. P2 发出 PrRd, 然后发出 BusRd, P1 或者 P3 接收到这个事件，将自己的 cache entry 发给 P2
 
-MESI protocol 也有自己的缺点， 当 write/read invalid cache entry 时，需要等待很久，去查询其它 core 中该cache entry 的状态。 并且当需要 invalidate cache entry in other cores, 也需要花费很长时间。为了解决这些问题， 引入 store buffer 和 invalidate queue
+MESI protocol 也有自己的缺点， 
+1. 当 write/read invalid cache entry 时，可能需要等待很久，因为要stall 直到收到所有其它 CPU 的 invalidation acknownledge.这是发送端的阻塞。
+2. 当需要 invalidate cache entry in own cache, 也可能需要花费很长时间。这是接收端的阻塞。
+
+为了解决这些问题， 引入 store buffer 和 invalidate queue
 
 ![](image/store-buffer-invalidate-queue.png)
 
