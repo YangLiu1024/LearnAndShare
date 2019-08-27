@@ -24,7 +24,9 @@ BusUpgr | another processor which have the entry in cache request to write the c
 Flush | an entire cache entry is written back to main memory by another processor
 Flushopt | an entire block is posted on the bus in order to supply it to another processor(cache to cache transfer)
 
+
 对于bus event, 有的书本也有另外一套称呼
+
 Event Name | Comment
 -----------| -------
 Read | another processor request to read a cache entry(same to BusRd), the message contain the physical address of the cache line
@@ -33,6 +35,7 @@ Invalidate | the message contain the physical address of cache line to be invali
 Invalidate Acknownledge |  A CPU recieve Invalidate message must repsond with Invalidate Acknownledge message after invalidate their copies
 Read Invalidate | the combination of Read and Invalidate
 Writeback | the message contain both the data and its physical address to be written back to memory or another CPU cache
+
 
 M 和 E 的状态总是精确的， 但是S不是。 当其它 S cache entry 被它们的cache discard时，它们并不会通知当前 cache, 则当前的cache entry事实上是 Exclusive，但是它的状态仍然是S。
 
