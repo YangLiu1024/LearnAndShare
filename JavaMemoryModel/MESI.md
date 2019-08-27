@@ -168,18 +168,72 @@ sfence 会强制 CPU flush its store buffer before applying each subsequent stor
 
 ## Invalidate queue
 为了解决问题 #2， 引入 invalidate queue
-
 ![](image/store-buffer-invalidate-queue.png)
 
+解决了主动发送信号端的效率问题，那么接收端 CPU 再接收到 invalidate 信号后也不是立即采取相应行动，而是把 invalidate 信号插入到一个 invalidaye queue 中，且立即返回 ACK 信号。 等待合适的时间，再去处理这个 queue 中的 invalidate. CPU 承诺在处理 invalidation queue 中的 message 之前，不会发送任何有关这个 message 所对应 cache line 的任何 MESI message. 需要注意的是，如果 CPU 中有 a 的 cache line, 并且接收到了 a 的 invalidate message, 在处理这个message 之前， CPU 仍然可以 load a, 甚至可以 write a, 只要不发出任何有关 a 的MESI message即可。因此就会有潜在的脏读现象存在。 除了脏读之外，invalidate queue 也可能造成内存重排序。
+```java
+void foo(void) {
+  a = 1;
+  //插入写屏障
+  sfence();
+  b = 1;
+}
 
+void bar(void) {
+  while (b == 0) continue;
+  assert (a == 1);
+}
+```
+现在 enable 了 store buffer 和 invalidate queue, 对于上述示例，执行序列可能如下所示
+<details>
+  <summary>A possibility of sequence of operations with store buffer and invalidate queue</summary>
+  
+  假设 a 被 CPU0 和 CPU1 share, b own by CPU0.
+  
+  1. CPU0 执行 a = 1, 发出 invalidate 信号，将 a=1 写入 store buffer
+  2. CPU1 接收 invalidate 信号，放入 invalidate queue, 立即返回 ACK
+  3. CPU0 执行 sfence, 将 store buffer 里 entry 打上标记
+  4. CPU0 接收 ACK, 将 a = 1 写入 cache line, 将状态改为 M
+  5. CPU0 执行 b = 1, 直接写入 cache line
+  6. CPU0 执行 while (b ==0), 发出 read 信号。(即使在#5 之前发出 read, 拿过来的值也是0, 并且将状态改为 S, 之后 #5 就会发出 invalidate 信号)
+  7. CPU0 接收 read 信号， 将 b 状态改为 S, 并打包发出
+  8. CPU1 接收到 read response, 将 b 写入 cache,然后跳出循环
+  9. CPU1 执行 assert (a ==1), 发现 a cache line 是 S, load 后 assert fail. (此时， CPU0 里面 a cache line 是 M, 值为1, 但是 CPU1 还没有处理 invalidate queue, 因此出现脏读)
+  10. CPU1 处理 invalidate queue, 标记 a cache line invalidate, 但是为时已晚。
+  
+  另外一种可能性
+  
+  5. CPU1 执行 while (b == 0), 发出 read 信号
+  6. CPU0 接收 read 信号，将 b cache line 状态改为 S, 且打包发出。 此时 b = 0
+  7. CPU1 接收到 read response, 写入cache, 继续执行循环
+  8. CPU0 执行 b = 1, 发现 b cache line 状态是 S, 发出 invalidate 信号，将 b = 1 写入 store buffer
+  9. CPU1 接收到 invalidate 信号， 放入 invalidate queue, 立即返回 ACK.
+  10. CPU0 接收到 ACK, 将 b =1 写入cache line, 状态改为 M
+  11. CPU1 处理 a invalidate 信号， 将 a cache line invalidate
+  12. CPU1 处理 b invalidate 信号， 将 b cache line invalidate
+  13. CPU1 发出 read 信号
+  14. CPU0 将 b 状态改为 S, 打包发出
+  15. CPU1 接收 read response, 写入 cache, 跳出循环
+  16. CPU1 发出 read 信号
+  17. CPU0 将 a 状态改为 S, 且打包发出
+  18. CPU1 接收到 read response, assert success
+  
+  可见， 加入 invalidate queue 后， 内存系统引起的重排序仍然可能发生。
+</details>
 
-同理， 解决了主动发送信号端的效率问题，那么接收端 CPU 再接收到 invalidate 信号后也不是立即采取相应行动，而是把 invalidate 信号插入到一个 invalidaye queue 中，且立即返回 ACK 信号。 等待合适的时间，再去处理这个 queue 中的 invalidate.
+为了解决这个问题，需要使用更多的内存屏障，那就是读屏障 lfence
+```java
+void foo(void) {
+  a = 1;
+  //插入写屏障
+  sfence();
+  b = 1;
+}
 
-store buffer 和 invalidate queue 虽然提升了 MESI 的性能，但是也引入了其它问题。
-1. CPU 会尝试从 store buffer 中读取值，尽管它还没有提交，这个方案称之为 store forwarding.
-2. store buffer 中的写入什么时候同步到 cache, 并没有保证
-3. CPU 什么时候处理 invalidate queue 并没有保证
-
-为了解决上述问题，又引入了 memory barrier
-
-
+void bar(void) {
+  while (b == 0) continue;
+  lfence()
+  assert (a == 1);
+}
+```
+lfence 会让CPU 标记当前 invalidate queue里的所有 entry, 强制要求CPU 之后所有的 load 操作必须等待 invalidate queue 里面被标记的 entry 真正应用到缓存后才能执行。
