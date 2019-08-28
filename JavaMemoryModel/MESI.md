@@ -2,13 +2,13 @@ Introduction to MESI
 
 # Table of contents
 1. [Definition](#definition)
-  1. [Events](#events)
-  2. [Handle PrRd/PrWr](#prrd-prwr)
-  3. [Handle bus events](#bus-events)
-  4. [Example](#example)
+  * [Events](#events)
+  * [Handle PrRd/PrWr](#prrd-prwr)
+  * [Handle bus events](#bus-events)
+  * [Example](#example)
 2. [Disadvantage of MESI](#disadvantage-mesi)
-  1. [Store Buffer](#store-buffer)
-  2. [Invalidate queue](#invalidate-queue)
+  * [Store Buffer](#store-buffer)
+  * [Invalidate queue](#invalidate-queue) 
 3. [Conclusion](#conclusion)
 
 # Definition <a name="definition"/>
