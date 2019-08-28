@@ -236,4 +236,23 @@ void bar(void) {
   assert (a == 1);
 }
 ```
-lfence 会让CPU 标记当前 invalidate queue里的所有 entry, 强制要求CPU 之后所有的 load 操作必须等待 invalidate queue 里面被标记的 entry 真正应用到缓存后才能执行。
+lfence 会让CPU 标记当前 invalidate queue里的所有 entry, 强制要求CPU 之后所有的 load 操作必须等待 invalidate queue 里面被标记的 entry 真正应用到缓存后才能执行。加入 lfence 后，程序执行顺序可能如下所示
+<details>
+  <summary>A possibility of sequence of operations with lfence</summary>
+
+  假设 a 被 CPU0 和 CPU1 share, b own by CPU0.
+  
+  1. CPU0 执行 a = 1, 写入 store buffer, 并且发出 invalidate 信号
+  2. CPU1 执行 while (b == 0), 发出 read 信号
+  3. CPU1 接收到 invalidate 信号， 放入 invalidate queue, 且立即返回 ACK
+  4. CPU0 执行 sfence, 标记当前 store buffer entry
+  5. CPU0 接收到 ACK, apply store buffer to cache, 将 a cache line 状态改为 M
+  6. CPU0 执行 b = 1, 因为 b own by CPU0, 且现在 store buffer 中没有标记的entry, 所以直接写入 cache line
+  7. CPU0 接收到 read 信号， 将 b cache line 状态改为 S, 且打包发出
+  8. CPU1 接收到 read response, 将 b 写入 cache, 跳出循环
+  9. CPU1 执行 lfence, 标记当前 invalidate queue
+  10. CPU1 在执行 assert 之前，必须要处理 invalidate queue, 因此会 invalidate  a cache line, 然后再发 read 信号， 最后 assert 成功
+  
+  区别在于 lfence 会迫使 CPU 在执行后续 load 之前必须清空当前 invalidate queue, 这样 a 就会被及时 invalidate.
+</details>
+
