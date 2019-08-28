@@ -1,15 +1,15 @@
 Introduction to MESI
 
 # Table of contents
-1. [Definition](#definition)
-  * [Events](#events)
-  * [Handle PrRd/PrWr](#prrd-prwr)
-  * [Handle bus events](#bus-events)
-  * [Example](#example)
-2. [Disadvantage of MESI](#disadvantage-mesi)
-  * [Store Buffer](#store-buffer)
-  * [Invalidate queue](#invalidate-queue) 
-3. [Conclusion](#conclusion)
+- [Definition](#definition)
+  - [Events](#events)
+  - [Handle PrRd/PrWr](#prrd-prwr)
+  - [Handle bus events](#bus-events)
+  - [Example](#example)
+- [Disadvantage of MESI](#disadvantage-mesi)
+  - [Store Buffer](#store-buffer)
+  - [Invalidate queue](#invalidate-queue) 
+- [Conclusion](#conclusion)
 
 # Definition <a name="definition"/>
 The MESI protocol is an invalidate-based cache coherence protocol, and is one of the most common protocol which support write-back caches.
