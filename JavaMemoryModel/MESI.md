@@ -256,3 +256,5 @@ lfence 会让CPU 标记当前 invalidate queue里的所有 entry, 强制要求CP
   区别在于 lfence 会迫使 CPU 在执行后续 load 之前必须清空当前 invalidate queue, 这样 a 就会被及时 invalidate.
 </details>
 
+但是sfence 和 lfence 并不是万能的， 在一些特定的 CPU 架构下，需要更 heavy 的内存屏障
+
