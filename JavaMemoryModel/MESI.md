@@ -1,6 +1,17 @@
 Introduction to MESI
 
-# Definition
+# Table of contents
+1. [Definition](#definition)
+  1. [Events](#events)
+  2. [Handle PrRd/PrWr](#prrd-prwr)
+  3. [Handle bus events](#bus-events)
+  4. [Example](#example)
+2. [Disadvantage of MESI](#disadvantage-mesi)
+  1. [Store Buffer](#store-buffer)
+  2. [Invalidate queue](#invalidate-queue)
+3. [Conclusion](#conclusion)
+
+# Definition <a name="definition"/>
 The MESI protocol is an invalidate-based cache coherence protocol, and is one of the most common protocol which support write-back caches.
 1. Modified(M): only valid in current cache, and is dirty, other cache can not access its responding cache line
 2. Exclusive(E): only valid in current cache, but is clean
@@ -13,7 +24,7 @@ The MESI protocol is an invalidate-based cache coherence protocol, and is one of
 对于S状态，如果其它 core 修改了它的 cache line, 则当前 core 的该cache line 会被标记为 Invalid
 对于I状态，表示当前cache entry invalid 且 unused, 可以被优先 replace
 
-## Events
+## Events <a name="events" />
 cache entry 的状态可以根据不同的事件进行更新。
 
 Event Name  | Comment
@@ -40,15 +51,15 @@ Writeback | the message contain both the data and its physical address to be wri
 
 M 和 E 的状态总是精确的， 但是S不是。 当其它 S cache entry 被它们的cache discard时，它们并不会通知当前 cache, 则当前的cache entry事实上是 Exclusive，但是它的状态仍然是S。
 
-## Handle PrRd/PrWr
+## Handle PrRd/PrWr <a name="prrd-prwr" />
 处于不同状态的 cache entry 在处理自己处理器 event 时的 response 如下表所示
 ![](image/mesi-change.png)
 
-## Handle bus events
+## Handle bus events <a name="bus-events" />
 处于不同状态的 cache entry 在处理其它处理器发出的 event 时的response 如下表所示
 ![](image/mesi-recieve.png)
 
-## Example
+## Example <a name="example" />
 An example to show how MESI works
 ![](image/mesi-example.png)
 
@@ -60,12 +71,12 @@ An example to show how MESI works
 6. P3 发出 PrRd, 发现自己 cache entry 是 S, 则直接读取返回
 7. P2 发出 PrRd, 然后发出 BusRd, P1 或者 P3 接收到这个事件，将自己的 cache entry 发给 P2
 
-# Disadvantages of MESI
+# Disadvantages of MESI <a name="disadvantage-mesi" />
 MESI protocol 也有自己的缺点， 
 1. 当 write/read invalid cache entry 时，可能需要等待很久，因为要stall 直到收到所有其它 CPU 的 invalidation acknownledge.这是发送端的阻塞。
 2. 当需要 invalidate cache entry in own cache, 也可能需要花费很长时间。这是接收端的阻塞。
 
-## Store buffer
+## Store buffer <a name="store-buffer" />
 为了解决问题 #1， 引入 store buffer
 ![](image/cache-store-buffer.png)
 
@@ -166,7 +177,7 @@ sfence 会强制 CPU flush its store buffer before applying each subsequent stor
   
 </details>
 
-## Invalidate queue
+## Invalidate queue <a name="invalidate-queue" />
 为了解决问题 #2， 引入 invalidate queue
 ![](image/store-buffer-invalidate-queue.png)
 
@@ -258,7 +269,7 @@ lfence 会让CPU 标记当前 invalidate queue里的所有 entry, 强制要求CP
 
 但是sfence 和 lfence 并不是万能的， 在一些特定的 CPU 架构下，需要更 heavy 的内存屏障
 
-# Conclusion
+# Conclusion <a name="conclusion" />
 CPU 之所以不按照代码顺序执行命令，一方面是 CPU 为了执行效率和性能，避免无谓等待，接受了多核 CPU 下的代码乱序，这是一种设计妥协。另一方面是编辑器为了执行效率，避免不合理的代码逻辑，也会对代码指令进行重排序。 重排序是呈现给开发者的表象，而内存可见性是指令乱序的另一种表现。
 
 CPU 在不断追求效率的同时，其架构也在不停演化。不管是 store buffer, 还是 invalidate queue, 甚至包括 message queue, 这些组件的引入无疑是在一步步摆脱 CPU 性能的束缚。频率越高，越不能接受无谓的 I/O 等待，解决无谓的等待就意味着要引入额外的高速 cache 元件加以缓冲，同时，也不可避免的进一步增加数据不一致的可能。解决这些问题，就需要引入内存屏障，内存屏障多种多样，在不同平台下甚至有不同实现，使用这些内存屏障又势必会制约 CPU 的性能发挥。而这，就需要我们开发者因场景而异，做出权衡。
