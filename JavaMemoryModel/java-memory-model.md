@@ -66,3 +66,11 @@ JSR-133 使用 happen-before 的概念来指定两个操作之间的执行顺序
 5. start 规则： 如果线程A 执行 ThreadB.start(), 那么 A 线程的 ThreadB.start() 操作 happen-before 于线程B 中的任意操作
 6. join 规则： 如果线程A 执行 ThreadB.join() 并成功返回，那么线程B中的任意操作 happen-before 于线程A从 ThreadB.join() 操作成功返回
 
+# Volatile
+volatile 变量的写，其汇编代码中，会有 lock 命令。该命令的作用在于
+1. 将当前处理器缓存行的数据写回到主存
+2. 这个写回内存的操作会被其它处理器探知，其它 CPU 会 invalidate 它们 cache 中对应的缓存行
+以前， 执行 lock 命令的处理器会锁住总线，处理器可以独占共享内存。在最近的处理器实现中，一般不锁总线，而是锁缓存行，因为锁总线开销较大。
+
+缓存一致性并不能保证内存可见性，因为为了提升性能，CPU 架构加入了 store buffer 和 invalidate queue, 导致可能缓存不一致，从而又引入内存屏障来解决这个问题。
+
