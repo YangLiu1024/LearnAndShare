@@ -189,23 +189,6 @@ void bar(void) {
   9. CPU1 执行 assert (a ==1), 发现 a cache line 是 S, load 后 assert fail. (此时， CPU0 里面 a cache line 是 M, 值为1, 但是 CPU1 还没有处理 invalidate queue, 因此出现脏读)
   10. CPU1 处理 invalidate queue, 标记 a cache line invalidate, 但是为时已晚。
   
-  另外一种可能性
-  
-  5. CPU1 执行 while (b == 0), 发出 read 信号
-  6. CPU0 接收 read 信号，将 b cache line 状态改为 S, 且打包发出。 此时 b = 0
-  7. CPU1 接收到 read response, 写入cache, 继续执行循环
-  8. CPU0 执行 b = 1, 发现 b cache line 状态是 S, 发出 invalidate 信号，将 b = 1 写入 store buffer
-  9. CPU1 接收到 invalidate 信号， 放入 invalidate queue, 立即返回 ACK.
-  10. CPU0 接收到 ACK, 将 b =1 写入cache line, 状态改为 M
-  11. CPU1 处理 a invalidate 信号， 将 a cache line invalidate
-  12. CPU1 处理 b invalidate 信号， 将 b cache line invalidate
-  13. CPU1 发出 read 信号
-  14. CPU0 将 b 状态改为 S, 打包发出
-  15. CPU1 接收 read response, 写入 cache, 跳出循环
-  16. CPU1 发出 read 信号
-  17. CPU0 将 a 状态改为 S, 且打包发出
-  18. CPU1 接收到 read response, assert success
-  
   可见， 加入 invalidate queue 后， 内存系统引起的重排序仍然可能发生。
 </details>
 
