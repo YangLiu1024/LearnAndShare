@@ -126,33 +126,9 @@ void bar(void) {
 }
 ```
 sfence 会强制 CPU flush its store buffer before applying each subsequent store to its variables's cache line. CPU 可以简单 stall 直到清空 store buffer, 也可以使用 store buffer hold subsequent stores util all of the prior entries in the store buffer had been applied.
-<details>
-  <summary>A possibility of sequence of operations with sfence</summary>
-  
-  假设 CPU0 执行 foo(), CPU1 执行 bar(). 且变量 a 只在 CPU1 cache 里，变量 b 只在 CPU0 cache 里。
-  
-  1. CPU0 执行 a = 1, 发现 a 不在 cache, 则发出 read-invalidate 信号， 并将 a = 1 写入 store buffer
-  2. CPU1 执行 while (b == 0), 发出 read 信号
-  3. CPU0 执行 sfence, 将现在 store buffer 中的所有 entry 打上标记
-  4. CPU0 接收到 read 信号， 将 b cache line 状态改为 S, 打包发出。 此时 b 的值还是 0
-  5. CPU0 执行 b = 1, 发现 store buffer 中还有标记的 entry, 因此将 b = 1 写入 store buffer, 且发出 invalidate 信号
-  6. CPU1 接收到 read response, 将 b cache line 填充到自己 cache. 发现值仍是 0, 因此继续执行循环
-  7. CPU1 接收到 read invalidate 信号， 将 a cache line invalidate, 然后打包发出, 且发出 invalidate acknownledge
-  8. CPU1 接收到 invalidate 信号， 将 b cache line invalidate, 且发出 invalidate acknownledge
-  9. CPU1 执行 while (b == 0), 发出 read 信号
-  10. CPU0 接收到 a cache line 和 ack, 将 a=1 apply 到cache line, 且将 a cache line 状态改为 M
-  11. CPU0 接收到 ack, 将 b = 1 写入 b cache line, 并将状态改为 M
-  12. CPU0 接收到 read 信号，将 b cache line 状态改为 S, 且打包发出
-  13. CPU1 接收到 read response, 将 b cache line 写入cache. b = 1, 跳出循环
-  14. CPU1 发出 read 信号读取 a
-  15. CPU0 接收到 read 信号，将 a cache line 状态改为 S, 并且打包发出
-  16. CPU1 接收到 read response, 将 a 写入cache, 执行 assert (a == 1), success
-  
-  这里的区别在于 CPU0 写 b = 1时，并不是直接写入 cache line, 而是写入 store buffer, 并且必须等待 a = 1 applied 后才能 apply(a = 1 已被标记). 意思就是即使 CPU0 先接收到 b 的 invalidat acknownledge, 也必须等待，直到接收到 a 的 invalidate acknownledge. 在此之前， CPU1 的每次 read 仍然只能拿到 b = 0(note that 因为 b = 1 仍然在 store buffer 里，CPU0 响应 b 的 read 信号时，不会返回 b = 1, 而是直接返回 cache 中的值)
-</details>
 
 <details>
-  <summary>Another possibility of sequence of operations with sfence</summary>
+  <summary>A possibility of sequence of operations with sfence</summary>
   
   假设 CPU0 执行 foo(), CPU1 执行 bar(). 且变量 a 只在 CPU1 cache 里，变量 b 只在 CPU0 cache 里。
   
@@ -164,7 +140,7 @@ sfence 会强制 CPU flush its store buffer before applying each subsequent stor
   6. CPU1 接收到 read response, 将 b cache line 写入cache, 由于 b = 0, 继续执行循环
   7. CPU1 接收到 read invalidate 信号， 将 a cache line invalidate, 然后打包发出, 且发出 invalidate acknownledge
   8. CPU0 接收到 a cache line 和 ack, 将 a=1 apply 到cache line, 且将 a cache line 状态改为 M
-  9. 因为此时 store buffer 中已经没有标记的 operation, 因此可以 apply b=1 to cache
+  9. 因为此时 store buffer 中已经没有标记的 operation, 因此可以直接尝试 apply b=1 to cache
   10. 因为此时 b cache line 状态为 S, 因此 CPU0 发出 invalidate 信号
   11. CPU1 接收到 invalidate 信号， 将 b cache line invalidate, 并发出 invalidate acknownledge
   12. CPU0 接收到 ack, 将 b = 1 写入 b cache line, 并将状态改为 M
@@ -175,6 +151,7 @@ sfence 会强制 CPU flush its store buffer before applying each subsequent stor
   17. CPU0 接收到 read 信号，将 a cache line 状态改为 S, 并且打包发出
   18. CPU1 接收到 read response, 将 a 写入cache, 执行 assert (a == 1), success
   
+  这里的区别在于 CPU0 写 b = 1时，并不是直接写入 cache line, 而是写入 store buffer, 并且必须等待 a = 1 applied 后才能 apply自己(因为 a = 1 在 store buffer 里已被标记). 意思就是即使 CPU0 先接收到 b 的 invalidate acknownledge, 也必须等待，直到接收到 a 的 invalidate acknownledge. 在此之前， CPU1 的每次 read 仍然只能拿到 b = 0(note that 因为 b = 1 仍然在 store buffer 里，CPU0 响应 b 的 read 信号时，不会返回 b = 1, 而是直接返回 cache 中的值, store buffer 里的写入被隐藏， 然后在 apply b=1 to b cache line时，因为状态是 S, 要改为 M, 需要再次发送 invalidate 信号)
 </details>
 
 ## Invalidate queue <a name="invalidate-queue" />
