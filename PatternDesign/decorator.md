@@ -13,7 +13,7 @@
 
 2. Beverage + Condiment
 
-![](image/beverage_condiment.png)
+![](image/beverage_decorator.png)
 
 # Question
 
