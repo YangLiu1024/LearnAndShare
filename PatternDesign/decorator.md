@@ -4,7 +4,7 @@
 
 <details>
   <summary>Beverage Class</summary>
-  
+  ![](image/beverage.png)
 </details>
 
 2. 每种饮料可以添加多种调料，比如摩卡，冰糖，奶泡等。
