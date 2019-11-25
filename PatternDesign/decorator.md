@@ -8,6 +8,7 @@
 # Class diagram
 
 1. Beverage
+
 ![](image/beverage.png)
 
 # Question
