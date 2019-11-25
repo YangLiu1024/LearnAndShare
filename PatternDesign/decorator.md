@@ -1,14 +1,13 @@
 # Sample
 
 1. 星巴克订单系统. 星巴克提供多种饮料，比如各种各样的咖啡，果汁等等，每种饮料有自己的价格
-
-<details>
-  <summary>Beverage Class</summary>
-  ![](image/beverage.png)
-</details>
-
 2. 每种饮料可以添加多种调料，比如摩卡，冰糖，奶泡等。
 3. 每种饮料有小杯，中杯，大杯之分，添加的调料的价格也要根据饮料的大小改变
+
+
+# Class diagram
+
+1. Beverage
 ![](image/beverage.png)
 
 # Question
