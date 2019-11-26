@@ -15,6 +15,10 @@
 
 ![](image/beverage_decorator.png)
 
+3. Beverage + Size
+
+![](image/beverage_size.png)
+
 # Question
 
 1. 添加一种饮料，或者添加一种调料
