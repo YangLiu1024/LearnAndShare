@@ -19,6 +19,14 @@
 
 ![](image/beverage_size.png)
 
+4. Beverage + Price
+
+![](image/beverage_price.png)
+
+5. Beverage + Enum
+
+![](image/beverage_enum.png)
+
 # Question
 
 1. 添加一种饮料，或者添加一种调料
