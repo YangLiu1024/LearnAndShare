@@ -41,7 +41,7 @@
 
 Java IO classes
 
-![](image/java-io.ong)
+![](image/java-io.png)
 
 # Conclusion
 
