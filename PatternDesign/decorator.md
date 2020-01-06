@@ -9,19 +9,19 @@
 
 1. Beverage
 
-![Beverage](image/beverage.png)
+![](image/beverage.png)
 
 2. Beverage + Condiment
 
-![Beverage + Condiment](image/beverage_decorator.png)
+![](image/beverage_decorator.png)
 
 3. Beverage + Size
 
-![Beverage + Size](image/beverage_size.png)
+![](image/beverage_size.png)
 
 4. Beverage + Price
 
-![Beverage + Price](image/beverage_price.png)
+![](image/beverage_price.png)
 
 # Question
 
