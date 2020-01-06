@@ -1,7 +1,7 @@
 # Sample1
 
 1. 星巴克订单系统. 星巴克提供多种饮料，比如各种各样的咖啡，果汁等等，每种饮料有自己的价格
-2. 每种饮料可以添加多种调料，比如摩卡，冰糖，奶泡等。
+2. 每种饮料可以添加多种调料，比如摩卡，冰糖，奶泡等，调料也有自己的价格。
 3. 每种饮料有小杯，中杯，大杯之分，添加的调料的价格也要根据饮料的大小改变
 
 
@@ -9,19 +9,19 @@
 
 1. Beverage
 
-![](image/beverage.png)
+![Beverage](image/beverage.png)
 
 2. Beverage + Condiment
 
-![](image/beverage_decorator.png)
+![Beverage + Condiment](image/beverage_decorator.png)
 
 3. Beverage + Size
 
-![](image/beverage_size.png)
+![Beverage + Size](image/beverage_size.png)
 
 4. Beverage + Price
 
-![](image/beverage_price.png)
+![Beverage + Price](image/beverage_price.png)
 
 # Question
 
