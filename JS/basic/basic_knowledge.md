@@ -33,9 +33,12 @@ Introduction to basic knowledge of JS
   - postfix ++ --
   - prefix ++ -- ! typeof 
   - **  Exponentiation
-  - * / %
-  - + -
+  - \* / %
+  - \+ -
   - shift operator >> << >>>
   - <= >= > < instanceof in
   - == === != !==
   - other...
+9. access object property by obj.propname or obj["propname"], access object method by obj.func()
+10. this in function refer to the function owner
+11. js common events in html: onclick, onmouseover, onmouseout, onkeydown, etc...
