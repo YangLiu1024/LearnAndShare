@@ -11,7 +11,7 @@ Introduction to basic knowledge of JS
   - console.log("")
   - window.print() print current window
 4. a variable declared without value, will have default value <b>undefined</b>. if re-declared the variable, its value will be kept
-5. js comparison. note that when compare number and string, always convert string to number. empty text => 0, non-number text convert to NaN. when compare with NaN, always return false.
+5. js comparison. note that when compare number and string, always convert string to number. empty text => 0, non-number text convert to NaN. when compare with NaN, always return false. when compare two objects, always return false, because they are different object.
   - <b>==</b> equal value
   - <b>===</b> equal value and equal type
   - <b>!=</b> different value
@@ -42,3 +42,4 @@ Introduction to basic knowledge of JS
 9. access object property by obj.propname or obj["propname"], access object method by obj.func()
 10. this in function refer to the function owner
 11. js common events in html: onclick, onmouseover, onmouseout, onkeydown, etc...
+12. js array.splice(-1, 1) will delete element from ending
