@@ -15,4 +15,27 @@ Introduction to basic knowledge of JS
   - <b>==</b> equal value
   - <b>===</b> equal value and equal type
   - <b>!=</b> different value
-  - <b>!==</b> different value or different type 
+  - <b>!==</b> different value or different type
+6. the difference between null and undefined
+  - if a variable declared without value, its has default value <b>undefined</b>
+  - null could be asigned to a variable as a kind of special value
+  - null == undefined => true, null === undefined => false. because typeof null => object, typeof undefined => 'undefined'
+7. js data types
+  - string
+  - number
+  - boolean
+  - object note that for array, typeof array still return object
+  - function
+  - undefined
+8. js operator precedence, list in descend order
+  - () expression grouping
+  - . [] () new  member access operator and function call and creator
+  - postfix ++ --
+  - prefix ++ -- ! typeof 
+  - **  Exponentiation
+  - * / %
+  - + -
+  - shift operator >> << >>>
+  - <= >= > < instanceof in
+  - == === != !==
+  - other...
