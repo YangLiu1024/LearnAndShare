@@ -46,3 +46,6 @@ Introduction to basic knowledge of JS
 13. string in numeric operation will convert to number auto, for example, "100" - "10" => 90
 14. NaN is a number, typeof NaN => "number". but all logic operations with NaN will return false, even NaN == NaN. to check if a value is NaN, call global function isNaN(val)
 15. Infinity is a number, typeof Infinity => "number". the value outside of possible range will be Infinity or -Infinity
+16. the difference between array and object
+    - array use numbered index, object use named index
+    - array is a special kind of object 
