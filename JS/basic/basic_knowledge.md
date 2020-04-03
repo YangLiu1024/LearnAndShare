@@ -48,4 +48,16 @@ Introduction to basic knowledge of JS
 15. Infinity is a number, typeof Infinity => "number". the value outside of possible range will be Infinity or -Infinity
 16. the difference between array and object
     - array use numbered index, object use named index
-    - array is a special kind of object 
+    - array is a special kind of object
+  17. Math.PI, Math.round(), Math.ceil(), Math.floor(), Math.pow(x, y), Math.abs(), Match.sqrt(), Math.sin(), Math.cos(), Math.max(),
+  Math.min(), Math.random() return [0, 1)
+  18. Boolean(var) => true when var has value, false when var has not value.
+  0, "", -0, null, undefined, NaN, false => their Boolean(v) is false
+  19. if a variable is used without declared, regard as declared as var
+  20. switch statement use strict match ===, and need to add break for each case
+  21. js loop
+    - for (statement1; statement2; statement3), general for sentence
+    - for key in object, loops through the keys of an iterable objects
+    - for value of object, loops through the values of an iterable objects
+    - while and do/while
+  22. typeof always return string
