@@ -44,3 +44,5 @@ Introduction to basic knowledge of JS
 11. js common events in html: onclick, onmouseover, onmouseout, onkeydown, etc...
 12. js array.splice(-1, 1) will delete element from ending
 13. string in numeric operation will convert to number auto, for example, "100" - "10" => 90
+14. NaN is a number, typeof NaN => "number". but all logic operations with NaN will return false, even NaN == NaN. to check if a value is NaN, call global function isNaN(val)
+15. Infinity is a number, typeof Infinity => "number". the value outside of possible range will be Infinity or -Infinity
