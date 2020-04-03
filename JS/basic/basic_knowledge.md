@@ -49,15 +49,23 @@ Introduction to basic knowledge of JS
 16. the difference between array and object
     - array use numbered index, object use named index
     - array is a special kind of object
-  17. Math.PI, Math.round(), Math.ceil(), Math.floor(), Math.pow(x, y), Math.abs(), Match.sqrt(), Math.sin(), Math.cos(), Math.max(),
+17. Math.PI, Math.round(), Math.ceil(), Math.floor(), Math.pow(x, y), Math.abs(), Match.sqrt(), Math.sin(), Math.cos(), Math.max(),
   Math.min(), Math.random() return [0, 1)
-  18. Boolean(var) => true when var has value, false when var has not value.
+18. Boolean(var) => true when var has value, false when var has not value.
   0, "", -0, null, undefined, NaN, false => their Boolean(v) is false
-  19. if a variable is used without declared, regard as declared as var
-  20. switch statement use strict match ===, and need to add break for each case
-  21. js loop
+19. if a variable is used without declared, regard as declared as var
+20. switch statement use strict match ===, and need to add break for each case
+21. js loop
     - for (statement1; statement2; statement3), general for sentence
     - for key in object, loops through the keys of an iterable objects
     - for value of object, loops through the values of an iterable objects
     - while and do/while
-  22. typeof always return string
+22. typeof always return string
+23. js regex modifiers
+  - i, ignore case
+  - g, find all match instead of first
+24. regex object methods
+  - test, for example, /e/.test("abcdef") => true, because the text contain e
+  - exec, return the matched text as object
+25. try {} catch (err) {} finally {}. the err thrown by js itself always has properties "name" and "message"
+26. user can throw customized error. it could be string, number, boolean, object. and the catch will catch what you throw
