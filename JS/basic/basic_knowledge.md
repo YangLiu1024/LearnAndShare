@@ -43,3 +43,4 @@ Introduction to basic knowledge of JS
 10. this in function refer to the function owner
 11. js common events in html: onclick, onmouseover, onmouseout, onkeydown, etc...
 12. js array.splice(-1, 1) will delete element from ending
+13. string in numeric operation will convert to number auto, for example, "100" - "10" => 90
