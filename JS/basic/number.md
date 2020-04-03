@@ -7,6 +7,8 @@ treat as 0. for example, var x = 9.645; x.toFixed(0) => 10, x.toFixed() => 10, x
 3. toPrecision([optional precision]), returns a string, with a number written with a specified length, if absent, return original number
 for example, var x = 9.645; x.toPrecision() => 9.645, x.toPrecision(1) => 10, x.toPrecision(6) => 9.64500
 
+note that method 1.2.3 return string instead of number
+
 Global number functions
 1. isNaN(v), check if v is NaN or not
 2. Number(v), convert v to number, if not numeric, return NaN. 
