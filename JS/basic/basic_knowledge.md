@@ -53,7 +53,8 @@ Introduction to basic knowledge of JS
   Math.min(), Math.random() return [0, 1)
 18. Boolean(var) => true when var has value, false when var has not value.
   0, "", -0, null, undefined, NaN, false => their Boolean(v) is false
-19. if a variable is used without declared, regard as declared as var
+19. variable scope ccould be declared as local(declared in function) and global(out of function). local variable could only be accessed within function. if a variable is used without declared before, regard as declared as global. And global variable can be accessed by all
+scripts and all functions on the web.
 20. switch statement use strict match ===, and need to add break for each case
 21. js loop
     - for (statement1; statement2; statement3), general for sentence
@@ -69,3 +70,5 @@ Introduction to basic knowledge of JS
   - exec, return the matched text as object
 25. try {} catch (err) {} finally {}. the err thrown by js itself always has properties "name" and "message"
 26. user can throw customized error. it could be string, number, boolean, object. and the catch will catch what you throw
+27. js will move all "var" variables declaration to the top of current script or function, it means you can use variable before you declare it. this behavior call "hoist". note that it only hoist declaration, not including intialization.
+28. strict mode is declared by adding "use strict" to the beginning of script(all code will be executed in strict mode) or function(the code in function will be executed in strict mode)
