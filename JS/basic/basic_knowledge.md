@@ -84,7 +84,8 @@ scripts and all functions on the web.
   }
   person.fullname()//John White for normal function, the this will refer to the person
   person.fullname()//undefined undefined for arrow function, the this refer to the window
-  ``
+  ```
+  
 30. ES5 support global scope and function scope for variable. for ES6, support block scope.
   - var variable could have global scope and function scope, if declared in block, still have global scope
   - let variable could have global scope and function scope and block scope. when declared in block, it will shadow outside variable which has same name, and the block scope variable could not be aceessed by outside of block
