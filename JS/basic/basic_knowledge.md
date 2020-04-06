@@ -72,3 +72,16 @@ scripts and all functions on the web.
 26. user can throw customized error. it could be string, number, boolean, object. and the catch will catch what you throw
 27. js will move all "var" variables declaration to the top of current script or function, it means you can use variable before you declare it. this behavior call "hoist". note that it only hoist declaration, not including intialization.
 28. strict mode is declared by adding "use strict" to the beginning of script(all code will be executed in strict mode) or function(the code in function will be executed in strict mode)
+29. this referred to the owner object when used in object method, refer to the window(undefined in strict mode) when used in function
+  ```js
+  var person {
+    firstname: "John",
+    lastname : "White",
+    fullname : function() {
+      return this.firstname + lastname();
+    }
+    fullname : () => {return this.firstname + this.lastname}
+  }
+  person.fullname()//John White for normal function, the this will refer to the person
+  person.fullname()//undefined undefined for arrow function, the this refer to the window
+  ```
