@@ -84,4 +84,23 @@ scripts and all functions on the web.
   }
   person.fullname()//John White for normal function, the this will refer to the person
   person.fullname()//undefined undefined for arrow function, the this refer to the window
+  ``
+30. ES5 support global scope and function scope for variable. for ES6, support block scope.
+  - var variable could have global scope and function scope, if declared in block, still have global scope
+  - let variable could have global scope and function scope and block scope. when declared in block, it will shadow outside variable which has same name, and the block scope variable could not be aceessed by outside of block
+  - redeclaring var variable will override existed declaring, redeclaring let variable will not
+  ```js
+  var x = 1;
+  {
+    var x = 2;
+  }
+  //x = 2 here
+  let y = 1;
+  {
+    let y = 2;
+  }
+  //y = 1 here, the y in block shadow the y outside
   ```
+  - global var and global let are alomost same, function var and function let are almost same
+31. the const variable behavior like <b>let</b>, except that the const variable could not be reassigned. it means the variable itself is const, but the value it referred is changable. same concept as "pointer constant", the pointer is constant, but its value is not.
+32. const and let does not support hoist. refer to #27
