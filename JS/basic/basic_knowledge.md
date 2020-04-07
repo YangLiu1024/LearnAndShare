@@ -105,3 +105,24 @@ scripts and all functions on the web.
   - global var and global let are alomost same, function var and function let are almost same
 31. the const variable behavior like <b>let</b>, except that the const variable could not be reassigned. it means the variable itself is const, but the value it referred is changable. same concept as "pointer constant", the pointer is constant, but its value is not.
 32. const and let does not support hoist. refer to #27
+33. - <b>this</b> in general function always refer to the caller of the function, the window, the document, the object, the button, or whatever
+    - <b>this</b> in arrow function always refer to the owner(who define the function) of the function
+    ```js
+    //regular function, the this always refer to the caller
+    hello = function() {
+       document.getElementById("demo").innerHTML += this;
+    }
+    //arrow function, the this always refer to the owner
+    hello = () => document.getElementById("demo").innerHTML += this;
+
+    window.addEventListener("load", hello); //refer to the window for both regular and arrow function
+    window.getElementById("btn").addEventListener("click", hello)//refer to the button for regular function, refer to window for arrow function
+    ```
+34. regular function definition for object method or class method
+   ```js
+   var person = {
+     hello: function() {return "hello"}
+     //equal to
+     hello() {return "hello"}
+   }
+   ```
