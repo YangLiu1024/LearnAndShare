@@ -19,7 +19,7 @@ Introduction to basic knowledge of JS
 6. the difference between null and undefined
   - if a variable declared without value, its has default value <b>undefined</b>
   - null could be asigned to a variable as a kind of special value
-  - <font color=#FF0000>null == undefined => true, null === undefined => false</font>. because typeof null => object, typeof undefined => 'undefined'
+  - null == undefined => true, null === undefined => false. because typeof null => object, typeof undefined => 'undefined'
 7. js data types
   - string
   - number
@@ -55,7 +55,7 @@ Introduction to basic knowledge of JS
   0, "", -0, null, undefined, NaN, false => their Boolean(v) is false
 19. variable scope ccould be declared as local(declared in function) and global(out of function). local variable could only be accessed within function. if a variable is used without declared before, regard as declared as global. And global variable can be accessed by all
 scripts and all functions on the web.
-20. <font color=#00FF00>switch statement use strict match ===</font>, and need to add break for each case
+20. <font color=red>switch statement use strict match ===</font>, and need to add break for each case
 21. js loop
     - for (statement1; statement2; statement3), general for sentence
     - for key in object, loops through the keys of an iterable objects
@@ -182,3 +182,41 @@ Model.func3()
   1 === true //false
   ```
   - <i>eval</i> execute arbitrary text as code which is not safe
+38. Object methods
+  - Object.defineProperty(object, property, descriptor) or Object.defineProperties(object, descriptors)
+  ```js
+  var person = {
+    firstname: "John",
+    lastname: "White"
+  };
+  Object.defineProperty(person, "language", {
+    //property descriptor
+    value: "ENG",
+    writable: true,//if could change value
+    enumerable: false,//if could be enumerable, such as Object.keys(object)
+    //if configuable false,
+    //1. could not delete this property
+    //2. enumerable could not be changed any more
+    //3. writable could change from true to false, could not change from false to true
+    configuable: true
+  })
+  ```
+  - Object.getOwnPropertyDescriptor(object, property), return the descriptor
+  - Object. getOwnPropertyNames(object), return all owned properties as array
+  - Object.keys(object), return all enumerable properties as array
+  - Object.preventExtensions(object), prevent adding properties to object
+  ```js
+  var person = {
+    firstname: "john"
+  };
+  Object.preventExtensions(person);
+  person.lastname = "white"//now allowed, this line will cause error
+  ```
+  - Object. isExtensible(object), check object is extensible or not
+  - Object.seal(object)
+    * prevent adding property to object
+    * all existing properties become non-configuable
+  - Object.isSealed(object), check if object is sealed
+  - Object.freeze(object), prevent any change to object
+  - Object.isFrozen(object)
+  
