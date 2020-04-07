@@ -126,3 +126,45 @@ scripts and all functions on the web.
      hello() {return "hello"}
    }
    ```
+35. <b>class</b> definition
+```js
+class Car {
+  //the constructor, required, if not declared, compiler will add default empty constructor
+  //the constructor will be invoked when new instance auto
+  constructor(name) {
+    //init the properties
+    this._carname = name;
+  }
+  func1() {}
+  func2() {}
+  //getter and setter
+  get carname() {return this._carname}
+  set carname(name) {this._carname = name}
+  //static method
+  static func3() {//could not use this in static method}
+}
+//usgae
+var mycar = new Car("Ford");
+//getter, no need ()
+mycar.carname
+//setter
+mycar.carname = "qq"
+//static, should be called by class instead of instance
+Car.func3()
+```
+36. <b>extends</b> definition. 
+```js
+class Model extends Car {
+  constructor(name, mod) {
+    super(name)
+    this.model = mod;
+  }
+  
+  func4() {}
+}
+//usage
+mod = new Model("volvo", "mustang");
+mod.func1();
+mod.func4();
+Model.func3()
+```
