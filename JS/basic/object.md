@@ -26,3 +26,47 @@ for (let key in person) {
 }
 ``` 
 6. object getter/setter could give simpler sytax than function
+7. object constructor function
+```js
+//here, Person is a regular function yet
+function Person(firstname, lastname) {
+  this.firstname = firstname;
+  this.lastname = lastname;
+  //in this way, the object created could have default value for language property
+  this.language = "English"
+}
+//when called with new, its treated as object constructor method
+//the this in implementation will refer to the object it construt
+var person = new Person("john", "white");
+```
+fimilar object constructor: new String(), new Boolean(), new Array(), new Number(), new Date(), new Function() etc.
+8. to define a class, could use <b>class</b>
+```js
+class Person {
+  constructor(firstname, lastname) {
+    this.firstname = firstname;
+    this.lastname = lastname;
+  }
+  
+  func1() {}
+  func2() {}
+  static func3() {}
+}
+//usage
+var person = new Person("john", "white");
+```
+9. all js objects inherit properties and methods from a prototype. Date inherit from Date.prototype, Array inherit from Array.prototype,
+The Object.prototype is on the top of the prototype inheritance chain.
+10. to add properties or method to all existed given type objects, use <b>prototype</b> to change object consturctor.
+```js
+function Person(firstname, lastname) {
+  this.firstname = firstname;
+  this.lastname = lastname;
+}
+
+var person = new Person("john", "white");
+//person.language will be undefined now
+
+Person.prototype.language = "English"//add new property to all existed Person object
+//person.language will be "English" now
+```
