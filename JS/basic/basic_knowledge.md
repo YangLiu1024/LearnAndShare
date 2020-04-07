@@ -61,7 +61,7 @@ scripts and all functions on the web.
     - for key in object, loops through the keys of an iterable objects
     - for value of object, loops through the values of an iterable objects
     - while and do/while
-22. typeof always return string
+22. typeof always return string. note that when typeof a function variable, it return "function"
 23. js regex modifiers
   - i, ignore case
   - g, find all match instead of first
