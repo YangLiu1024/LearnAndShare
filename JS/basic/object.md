@@ -39,7 +39,9 @@ function Person(firstname, lastname) {
 //the this in implementation will refer to the object it construt
 var person = new Person("john", "white");
 ```
+
 fimilar object constructor: new String(), new Boolean(), new Array(), new Number(), new Date(), new Function() etc.
+
 8. to define a class, could use <b>class</b>
 ```js
 class Person {
