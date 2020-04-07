@@ -19,7 +19,7 @@ Introduction to basic knowledge of JS
 6. the difference between null and undefined
   - if a variable declared without value, its has default value <b>undefined</b>
   - null could be asigned to a variable as a kind of special value
-  - null == undefined => true, null === undefined => false. because typeof null => object, typeof undefined => 'undefined'
+  - <font color=#FF0000>null == undefined => true, null === undefined => false</font>. because typeof null => object, typeof undefined => 'undefined'
 7. js data types
   - string
   - number
@@ -55,7 +55,7 @@ Introduction to basic knowledge of JS
   0, "", -0, null, undefined, NaN, false => their Boolean(v) is false
 19. variable scope ccould be declared as local(declared in function) and global(out of function). local variable could only be accessed within function. if a variable is used without declared before, regard as declared as global. And global variable can be accessed by all
 scripts and all functions on the web.
-20. switch statement use strict match ===, and need to add break for each case
+20. <font color=#00FF00>switch statement use strict match ===</font>, and need to add break for each case
 21. js loop
     - for (statement1; statement2; statement3), general for sentence
     - for key in object, loops through the keys of an iterable objects
