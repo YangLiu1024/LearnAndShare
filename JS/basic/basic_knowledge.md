@@ -181,3 +181,4 @@ Model.func3()
   1 === "1" //false
   1 === true //false
   ```
+  - <i>eval</i> execute arbitrary text as code which is not safe
