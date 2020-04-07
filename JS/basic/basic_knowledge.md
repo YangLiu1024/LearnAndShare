@@ -168,3 +168,16 @@ mod.func1();
 mod.func4();
 Model.func3()
 ```
+37. avoid global variable, avoid <b>new</b>, avoid <b>==</b>, avoid <i>eval</i>
+  - global variable could be accessed and overwrite by all scripts of this web page
+  - avoid new Boolean(), new String(), new Array(), new Function(), new Object()...
+  - <b>==</b> always convert to matching types before do comparision
+  ```js
+  0 == "" //true
+  1 == "1" //true, note that Boolean("asd") => true
+  1 == true //true
+  
+  0 === "" //false
+  1 === "1" //false
+  1 === true //false
+  ```
