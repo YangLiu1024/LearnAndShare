@@ -7,7 +7,7 @@
 ## How to use 
 Assume that we have a repository [Host repo](https://github.com/YangLiu1024/GitSubTreeTestHostRepo), add we want to split its icons folder to [Split repo](https://github.com/YangLiu1024/GitSubTreeTestSplitRepo), and add a sub repository [Leaf repo](https://github.com/YangLiu1024/GitSubTreeTestLeafRepo).
 
-### Split sub folder
+### Split sub folder icons
 the command format: `git subtree split --prefix=<path-to-sub-folder> --branch <branch-name> --squash`
 
 this command will extract all previously commits of sub folder to generate a new branch which named <branch-name>, `--squash` is optional, which means wrap all previously commits into one commit.
@@ -19,7 +19,7 @@ git subtree split -P icons --branch icons
   
 now, a new branch `icons` which contain all previous commit history of `icons` folder is created.
 
-### Push to new repository
+### Push to new split repository
 Now, create a new folder, such as `GitSubTreeTestSplitRepo`, then execute `git init` to initialize. 
 
 Then execute  `git pull <path-to-host-repo> icons` to merge `icons` branch of host repo to new repository master branch.
@@ -61,7 +61,28 @@ now, a new folder `leaf` is created which contain the code of `Leaf repo` of bra
 
 Finally, `git push` to sync the change.
 
+### Push change in host repo to sub repo
+User develop on host repository as usually, and they may change some files under `split repo` or `leaf repo` folder.
+all things work expected as single repository. 
 
-## Benifit
+note that the files under `split repo` folder or 'leaf repo' folder is just synced within current host repository, the real 'Split repo' or `Leaf repo` is not impacted.
+
+And at suitable time, user want to sync the change on `split repo` folder or `leaf repo` folder to real repository, he need to execute
+```git
+git subtree push -P <path-to-sub-folder> <url-to-repository> <branch-name>
+```
+to push the change to real sub repository.
+
+Note that current host repo will extract all commits to `<path-to-sub-folder>` intelligently, then push to <url-to-repository> <branch-name>
+  
+### Pull change in sub repo to host repo
+The sub repo maybe get some update by someone others, to sync the change to host repo, need to execute
+```git
+git subtree pull -P <path-to-sub-folder> <url-to-repository> <branch-name>
+```
+note that `git pull` in host repo will only fetch the change made in host repo, if sub repo is changed by someone else, need to execute `git subtree pull` to sync
+
+
+## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
 Just need to sync sub repository at suitable time.
