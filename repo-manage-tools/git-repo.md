@@ -172,23 +172,23 @@ project leaf/                                   (*** NO BRANCH ***)
 the status information for each file use two-letter code.
 
 for the first letter, an uppercase letter indicate how the staging area differ from the last committed state
-Letter   |  Meaning  | Description
--------- | --------- | -----------
-\- | no change | smae in HEAD and index
-A | Added | not in HEAD, in index
-M | Modified | in HEAD, modified in index
-D | Deleted | in HEAD, not in index
-R | Renamed | not in HEAD, path changed in index
-C | Copied | not in HEAD, copied from another index
-T | Mode changed | same content in HEAD and index, mode changed
-U | Unmerged | conflict between HEAD and index, need to resolve 
+Letter   |  Meaning  
+-------- | ---------
+\- | no change
+A | Added
+M | Modified 
+D | Deleted 
+R | Renamed 
+C | Copied 
+T | Mode changed
+U | Unmerged
 
 for the second letter, a lowercase letter indicate how the working directory differ from the index
-Letter | Meaning | Description
------- | ------- | -----------
-\- | New/unknown | not in index, in work tree
-m | Modified | in index, index work tree, modified
-d | Deleted | in index, not in work tree
+Letter | Meaning
+------ | -------
+\- | New/unknown
+m | Modified 
+d | Deleted
 
 ### Create branch through repo
 ```git
