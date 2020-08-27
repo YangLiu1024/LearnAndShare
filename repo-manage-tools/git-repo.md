@@ -24,4 +24,84 @@ chmod a+x ~/bin/repo
 when execute the `repo` command, the script will download the real repository `https://gerrit.googlesource.com/git-repo/`
 
 ### Manifest repository
-The information about how to manage multiple repository and all configuration of sub repository is stored in an independent repository, which usually named `manifest`.
+The information about how to manage multiple repository and all configuration of sub repository is stored in an independent repository, which usually called `manifest`.
+
+And within this manifest repository, a file named `default.xml` is required. All configuration information store in this file.
+
+A simple example, refer to [Manifest repo](https://github.com/YangLiu1024/GitRepoManifestRepo)
+```xml
+<manifest>
+    <remote name="github" fetch="https://github.com"/>
+    <default revision="refs/heads/master" remote="github" sync-j="4"/>
+    <project name="YangLiu1024/GitSubTreeTestLeafRepo" remote="github" path="leaf"/>
+    <project name="YangLiu1024/GitSubTreeTestSplitRepo" remote="github" path="split"/>
+</manifest>
+```
+the `<manifest>` is the root element.
+
+`<remote>` is used to config remote repository, could be multiple.
+  - `name` is the name of remote repository, should be unique in this xml among all remotes.
+  - `fetch` is the prefix of repository address, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo` for leaf repo
+
+`<project>` is used to config each sub repository
+  - `name` the name of sub repository
+  - `path` when execute `repo sync`, the relative path to root directory, and the code in sub repository will be downloaded to this sub folder
+  - `remote` the remote defined in `<remote>`
+  - `revision` the branch name
+  
+`<default>` is used to defined the default value for project attribute if its not defined in `<project>`
+
+### Initialize the git-repo
+when manifest repository is ready, its time to initialize our repo work space.
+```git
+repo init -u <url-to-manifest-repo> -b <manifest-repo-branch-name> -m <selected-manifest-file-name>
+```
+`-b` is optional, its default value is `master`
+
+`-m` is optional, its default value is `default.xml`
+
+in my case, it wil be
+```git
+repo init -u https://github.com/YangLiu1024/GitRepoManifestRepo
+```
+in this step, a folder named `.repo` will be created, `repo` will download latest [git-repo](https://gerrit.googlesource.com/git-repo/) to sub folder `repo`, and the folders for manifest repository
+```git
+yangliu@LT424684 MINGW64 /git-repo-demo/.repo
+$ ls -al
+total 23
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ./
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ../
+-rw-r--r-- 1 wa-clxie 1049089 514 Aug 27 11:18 manifest.xml
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:18 manifests/
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 manifests.git/
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
+```
+
+Now, time to sync all sub repository to our work space.
+```git
+repo sync -f -d -m <selected-manifest-file-name>
+```
+`-f` means even if current project fail to sync, continue to sync next project
+
+`-d` means roll back current work space to the revision defined in manifest file
+
+`-m` means use specified manifest file
+
+after this command, all sub repository defined in `default.xml` will be downloaded to our work space,the file structure shown as below
+```git
+$ ls -al
+total 23
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ./
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ../
+-rw-r--r-- 1 wa-clxie 1049089 126 Aug 27 11:21 .repo_fetchtimes.json
+-rw-r--r-- 1 wa-clxie 1049089 514 Aug 27 11:18 manifest.xml
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:18 manifests/
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 manifests.git/
+-rw-r--r-- 1 wa-clxie 1049089  13 Aug 27 11:21 project.list
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 project-objects/
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 projects/
+drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
+```
+
+## Common Error
+
