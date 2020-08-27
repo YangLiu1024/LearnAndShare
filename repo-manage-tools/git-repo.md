@@ -84,7 +84,7 @@ repo sync -f -d -m <selected-manifest-file-name> <projects>...
 ```
 `-f` means even if current project fail to sync, continue to sync next project
 
-`-d` means roll back current work space to the revision defined in manifest file
+`-d` means check out to the branch defined in manifest file automatic before sync
 
 `-m` means use specified manifest file
 
@@ -92,7 +92,7 @@ after this command, all or specifed sub repository defined in `default.xml` will
 
 note that when specify project name, `repo sync <project>`
 * if this project has never been synced before, its equal to `git clone`, all branches in remote repository will be copied to local project directory
-* if this project has been synced before, then its equal to `git remote update; git rebase origin/<branch>`, where `branch` is the currently checked-out branch in the local project directory. 
+* if this project has been synced before, then its equal to `git remote update; git rebase`, it will use currently checked-out branch in the local project directory to rebase. 
   - if the local branch isn't tracking a remote branch, then no synchronization occurs for the project
   - if the git rebase operation result in merge conflicts, use normal git command, such as git rebase --continue, to resolve the conflicts
   
@@ -132,6 +132,12 @@ $ .repo/repo/repo status
 nothing to commit (working directory clean)
 ```
 
+### Diff repo
+```git
+repo diff <projects>...
+```
+show changes under repo
+
 ### Modify project
 Do any modification to leaf project, then execute `repo status` again
 ```git
@@ -140,10 +146,6 @@ project leaf/                                   (*** NO BRANCH ***)
  -m     leaf.md
 ```
 to check the diff, 
-```git
-repo diff
-```
-the diff results
 ```git
 $ .repo/repo/repo diff leaf/leaf.md
 
@@ -167,6 +169,14 @@ project split/                                  (*** NO BRANCH ***)
 project leaf/                                   (*** NO BRANCH ***)
  -m     leaf.md
 ```
+the status information for each file use two-letter code.
+
+for the first letter, an uppercase letter indicate how the staging area differ from the last committed state
+Letter   |  Meaning  | Description
+-------- | --------- | -----------
+- | no change | smae in HEAD and index
+
+for the second letter, a lowercase letter indicate how the working directory differ from the index
 
 ### Create branch through repo
 ```git
@@ -189,7 +199,13 @@ project leaf/                                   branch modify-through-repo
 ```git
 repo forall <project_list> -c <git command>
 ```
-this command will execute `<git command>` for all specified projects, for example `repo forall -c git push`
+this command will execute `<git command>` for all specified projects through `/bin/sh`, for example `repo forall -c git push`
+
+### Delelet merged branch
+```git
+repo prune <projects>...
+```
+Delete branch that are already merged
 
 ### Show current used manifest
 ```git
