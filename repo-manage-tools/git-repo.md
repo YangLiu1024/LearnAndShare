@@ -40,7 +40,7 @@ A simple example, refer to [Manifest repo](https://github.com/YangLiu1024/GitRep
 the `<manifest>` is the root element.
 
 `<remote>` is used to config remote repository, could be multiple.
-  - `name` is the name of remote repository, should be unique in this xml among all remotes.
+  - `name` is the name of remote repository, should be unique in this xml among all remotes. the name here will be used as remote name after `repo sync` for the project download from this remote, in another word, its equal to `git remote add <remote.name> <remote.fetch + project.name>` for each project.
   - `fetch` is the prefix of repository address, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo` for leaf repo
 
 `<project>` is used to config each sub repository
@@ -114,6 +114,8 @@ drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 project-objects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 projects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
 ```
+note that for each project, it has no local branch yet
+
 ### Check repo status
 ```git
 repo status
