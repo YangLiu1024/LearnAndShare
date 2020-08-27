@@ -1,5 +1,32 @@
 # Introduction to git subtree.
 
+## Git subtree help
+```bash
+-bash-4.1$ git subtree
+usage: git subtree add   --prefix=<prefix> <commit>
+   or: git subtree add   --prefix=<prefix> <repository> <ref>
+   or: git subtree merge --prefix=<prefix> <commit>
+   or: git subtree pull  --prefix=<prefix> <repository> <ref>
+   or: git subtree push  --prefix=<prefix> <repository> <ref>
+   or: git subtree split --prefix=<prefix> <commit...>
+
+    -h, --help            show the help
+    -q                    quiet
+    -d                    show debug messages
+    -P, --prefix ...      the name of the subdir to split out
+    -m, --message ...     use the given message as the commit message for the merge commit
+
+options for 'split'
+    --annotate ...        add a prefix to commit message of new commits
+    -b, --branch ...      create a new branch from the split subtree
+    --ignore-joins        ignore prior --rejoin commits
+    --onto ...            try connecting new tree to an existing one
+    --rejoin              merge the new branch back into HEAD
+
+options for 'add', 'merge', and 'pull'
+    --squash              merge subtree changes as a single commit
+```
+
 ## Usage case
 1. Sometimes, we want to split our code to separated repository and keep its commit history.
 2. Sometimes, we put common code in separated repository and want to use its code in our project directly.
