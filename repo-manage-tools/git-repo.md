@@ -114,17 +114,67 @@ drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 project-objects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 projects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
 ```
-### Create branch through repo
-```git
-repo start <new-branch-name> [--all | <project>...]
-```
-this command will create new branch for all or specifed projects
-
 ### Check repo status
 ```git
 repo status
 ```
 similar with `git status`, this command will list modification info for all projects
+```git
+$ .repo/repo/repo status
+nothing to commit (working directory clean)
+```
+
+### Modify project
+Do any modification to leaf project, then execute `repo status` again
+```git
+$ .repo/repo/repo status
+project leaf/                                   (*** NO BRANCH ***)
+ -m     leaf.md
+```
+to check the diff, 
+```git
+repo diff
+```
+the diff results
+```git
+$ .repo/repo/repo diff leaf/leaf.md
+
+project leaf/
+diff --git a/leaf.md b/leaf.md
+index 8a82ad7..4157327 100644
+--- a/leaf.md
++++ b/leaf.md
+@@ -4,3 +4,5 @@ modify the file by leaf repo
+ //after git subtree pull -P leaf leaf master, there will be conflict
+ //because both host repo and leaf repo modify the file
+ //so fix the conflict and commit the change again
++
++modify the leaf.md from repo work space
+```
+then modify any file for `split` project, then check status
+```git
+$ .repo/repo/repo status
+project split/                                  (*** NO BRANCH ***)
+ -d     settings-16.png
+project leaf/                                   (*** NO BRANCH ***)
+ -m     leaf.md
+```
+
+### Create branch through repo
+```git
+repo start <new-branch-name> [--all | <project>...]
+```
+`<project>` could be `project.name` or `project.path` defined in manifest file
+
+this command will create new branch for all or specifed projects
+```git
+$ .repo/repo/repo start modify-through-repo leaf split
+$ .repo/repo/repo status
+project split/                                  branch modify-through-repo
+ -d     settings-16.png
+project leaf/                                   branch modify-through-repo
+ -m     leaf.md
+```
 
 ### Execute command for all projects
 ```git
