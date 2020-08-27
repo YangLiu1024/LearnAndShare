@@ -114,7 +114,7 @@ drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 project-objects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 projects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
 ```
-note that for each project, it has no local branch yet
+<b>note that for each project, it has no local branch yet.</b>
 
 ### Check repo status
 ```git
@@ -168,7 +168,8 @@ repo start <new-branch-name> [--all | <project>...]
 ```
 `<project>` could be `project.name` or `project.path` defined in manifest file
 
-this command will create new branch for all or specifed projects
+this command will create new branch for all or specifed projects, <b>and the new created branch is based on the branch defined in manifest file and track this remote branch automaticly</b>
+
 ```git
 $ .repo/repo/repo start modify-through-repo leaf split
 $ .repo/repo/repo status
