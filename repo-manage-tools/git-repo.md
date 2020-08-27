@@ -51,6 +51,8 @@ the `<manifest>` is the root element.
   
 `<default>` is used to defined the default value for project attribute if its not defined in `<project>`
 
+more information about manifest format, please refer to [manifest format](https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.md)
+
 ### Initialize the git-repo
 when manifest repository is ready, its time to initialize our repo work space.
 ```git
@@ -90,6 +92,16 @@ repo sync -f -d -m <selected-manifest-file-name>
 after this command, all sub repository defined in `default.xml` will be downloaded to our work space,the file structure shown as below
 ```git
 $ ls -al
+total 12
+drwxr-xr-x 1 wa-clxie 1049089 0 Aug 27 11:21 ./
+drwxr-xr-x 1 wa-clxie 1049089 0 Aug 27 11:07 ../
+drwxr-xr-x 1 wa-clxie 1049089 0 Aug 27 11:21 .repo/
+drwxr-xr-x 1 wa-clxie 1049089 0 Aug 27 11:21 leaf/
+drwxr-xr-x 1 wa-clxie 1049089 0 Aug 27 11:21 split/
+```
+for `.repo` folder, some new folders are created
+```git
+$ ls -al
 total 23
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ./
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ../
@@ -102,6 +114,29 @@ drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 project-objects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 projects/
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
 ```
+### Create branch through repo
+```git
+repo start <new-branch-name> [--all | <project>...]
+```
+this command will create new branch for all or specifed projects
+
+### Check repo status
+```git
+repo status
+```
+similar with `git status`, this command will list modification info for all projects
+
+### Execute command for all projects
+```git
+repo forall <project_list> -c <git command>
+```
+this command will execute `<git command>` for all specified projects, for example `repo forall -c git push`
+
+### Show current used manifest
+```git
+repo manifest
+```
+this command will print current used manifest file
 
 ## Common Error
 
