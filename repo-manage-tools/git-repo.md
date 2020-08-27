@@ -14,6 +14,8 @@ To solve this issue, introduce multiple repository management solution, such as 
 ## Git-repo
 `git-repo` is an extension of git which could support huge size sub repository. Its actually a set of `python` script which used to manage multiple repository.
 
+<b>Official</b>: Repo is a tool that we built on top of Git. Repo helps us manage the many Git repositories, does the uploads to our revision control system, and automates parts of the Android development workflow. Repo is not meant to replace Git, only to make it easier to work with Git in the context of Android. The repo command is an executable Python script that you can put anywhere in your path.
+
 ### Environment Setup
 * Install python 3.6 or above
 * Download repo, the repo here is a python script indeed. 
