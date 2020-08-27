@@ -226,4 +226,20 @@ repo manifest
 this command will print current used manifest file
 
 ## Common Error
+### Symlinks
+Repo will use symlinks heavily internally. On *NIX platforms, this isn't an issue, but Windows makes it a bit difficult.
+
+There are some documents out there for how to do this, but usually the easiest answer is to run your shell as an Administrator and invoke repo/git in that.
+
+This isn‘t a great solution, but Windows doesn’t make this easy, so here we are. 
+
+Launch Git Bash
+If you install Git Bash (see below), you can launch that with appropriate permissions so that all programs “just work”.
+
+* Open the Start Menu (i.e. press the ⊞ key).
+* Find/search for “Git Bash”.
+* Right click it and select “Run as administrator”.
+
+### Network forbidden
+If you can not access [Gerrit repo](https://gerrit.googlesource.com/git-repo/) because of firewall or something, you can try its [github mirror](https://github.com/GerritCodeReview/git-repo)
 
