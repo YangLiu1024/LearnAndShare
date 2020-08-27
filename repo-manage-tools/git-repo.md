@@ -41,7 +41,7 @@ the `<manifest>` is the root element.
 
 `<remote>` is used to config remote repository, could be multiple.
   - `name` is the name of remote repository, should be unique in this xml among all remotes. the name here will be used as remote name after `repo sync` for the project download from this remote, in another word, its equal to `git remote add <remote.name> <remote.fetch + project.name>` for each project.
-  - `fetch` is the prefix of repository address, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo` for leaf repo
+  - `fetch` is the prefix of repository address, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name` + `.git`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo.git` for leaf repo
 
 `<project>` is used to config each sub repository
   - `name` the name of sub repository
