@@ -68,7 +68,6 @@ repo init -u https://github.com/YangLiu1024/GitRepoManifestRepo
 ```
 in this step, a folder named `.repo` will be created, `repo` will download latest [git-repo](https://gerrit.googlesource.com/git-repo/) to sub folder `repo`, and the folders for manifest repository
 ```git
-yangliu@LT424684 MINGW64 /git-repo-demo/.repo
 $ ls -al
 total 23
 drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:21 ./
@@ -81,7 +80,7 @@ drwxr-xr-x 1 wa-clxie 1049089   0 Aug 27 11:20 repo/
 
 Now, time to sync all sub repository to our work space.
 ```git
-repo sync -f -d -m <selected-manifest-file-name>
+repo sync -f -d -m <selected-manifest-file-name> <projects>...
 ```
 `-f` means even if current project fail to sync, continue to sync next project
 
@@ -89,7 +88,14 @@ repo sync -f -d -m <selected-manifest-file-name>
 
 `-m` means use specified manifest file
 
-after this command, all sub repository defined in `default.xml` will be downloaded to our work space,the file structure shown as below
+after this command, all or specifed sub repository defined in `default.xml` will be downloaded to our work space,the file structure shown as below.
+
+note that when specify project name, `repo sync <project>`
+* if this project has never been synced before, its equal to `git clone`, all branches in remote repository will be copied to local project directory
+* if this project has been synced before, then its equal to `git remote update; git rebase origin/<branch>`, where `branch` is the currently checked-out branch in the local project directory. 
+  - if the local branch isn't tracking a remote branch, then no synchronization occurs for the project
+  - if the git rebase operation result in merge conflicts, use normal git command, such as git rebase --continue, to resolve the conflicts
+  
 ```git
 $ ls -al
 total 12
