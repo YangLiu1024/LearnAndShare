@@ -100,7 +100,69 @@ git subtree push -P <path-to-sub-folder> <url-to-repository> <branch-name>
 ```
 to push the change to real sub repository.
 
-Note that current host repo will extract all commits to `<path-to-sub-folder>` intelligently, then push to <url-to-repository> <branch-name>
+<b>Note:</b>
+* current host repo will extract all commits to `<path-to-sub-folder>` intelligently, then push to <url-to-repository> <branch-name>.
+* the commit id is not consistent between host repo and sub repo, `git subtree` will create new commit which has same change, then push to sub repository
+   
+<b>Sample:</b>
+1. modify leaf folder twice in host repo to create two commits. you can see origin/master refer to `301179`, first commit `da1459`, second commit `8165a4`
+```git
+$ git log
+commit 8165a46d7e5c321408fb3d80f558b40fd3130196 (HEAD -> master)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 12:00:56 2020 +0800
+
+    remove contents of leaf/readme
+
+commit da1459f5d0ff5e1f96b4d153de1dd31edd8b98a2
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 11:59:04 2020 +0800
+
+    remove some contents of leaf.md
+
+commit 301179e4e331099af9552d42f8ecc078179fd7e0 (origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 11:45:07 2020 +0800
+
+    modify leaf/readme and commit 2
+```
+2. push the change to `leaf` repo `master` branch
+```git
+git subtree push -P leaf leaf master
+```
+3. go to leaf repo, check current `HEAD` commit, it refer to `3caae6`
+```bash
+yangliu@LT424684 MINGW64 /GitSubTreeTestLeafRepo (master)
+$ git log
+commit 3caae68533e9786c6a810bfa5ff38df613420a93 (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 11:45:07 2020 +0800
+
+    modify leaf/readme and commit 2
+```
+4. pull leaf repo, you can find the first commit is `5e641e`, second commit is `3dac46`, which is inconsistent with host repository
+```bash
+$ git pull
+$ git log
+commit 3dac46cd22e3c88e91fab457ec675fd4c50a83d4 (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 12:00:56 2020 +0800
+
+    remove contents of leaf/readme
+
+commit 5e641ef551925b28696002c7b22fedfabb5eb4c5
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 11:59:04 2020 +0800
+
+    remove some contents of leaf.md
+
+commit 3caae68533e9786c6a810bfa5ff38df613420a93
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 11:45:07 2020 +0800
+
+    modify leaf/readme and commit 2
+
+```
   
 ### Pull change in sub repo to host repo
 The sub repo maybe get some update by someone others, to sync the change to host repo, need to execute
