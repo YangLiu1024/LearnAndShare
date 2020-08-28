@@ -105,66 +105,6 @@ to push the change to real sub repository.
 <b>Note:</b>
 * current host repo will extract all commits to `<path-to-sub-folder>` intelligently, then push to <url-to-repository> <branch-name>.
 * the commit id is not consistent between host repo and sub repo, `git subtree` will create new commit which has same change, then push to sub repository
-   
-<b>Sample:</b>
-1. modify leaf folder twice in host repo to create two commits. you can see origin/master refer to `301179`, first commit `da1459`, second commit `8165a4`
-```git
-$ git log
-commit 8165a46d7e5c321408fb3d80f558b40fd3130196 (HEAD -> master)
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 12:00:56 2020 +0800
-
-    remove contents of leaf/readme
-
-commit da1459f5d0ff5e1f96b4d153de1dd31edd8b98a2
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 11:59:04 2020 +0800
-
-    remove some contents of leaf.md
-
-commit 301179e4e331099af9552d42f8ecc078179fd7e0 (origin/master, origin/HEAD)
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 11:45:07 2020 +0800
-
-    modify leaf/readme and commit 2
-```
-2. push the change to `leaf` repo `master` branch
-```git
-git subtree push -P leaf leaf master
-```
-3. go to leaf repo, check current `HEAD` commit, it refer to `3caae6`
-```bash
-yangliu@LT424684 MINGW64 /GitSubTreeTestLeafRepo (master)
-$ git log
-commit 3caae68533e9786c6a810bfa5ff38df613420a93 (HEAD -> master, origin/master, origin/HEAD)
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 11:45:07 2020 +0800
-
-    modify leaf/readme and commit 2
-```
-4. pull leaf repo, you can find the first commit is `5e641e`, second commit is `3dac46`, which is inconsistent with host repository
-```bash
-$ git pull
-$ git log
-commit 3dac46cd22e3c88e91fab457ec675fd4c50a83d4 (HEAD -> master, origin/master, origin/HEAD)
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 12:00:56 2020 +0800
-
-    remove contents of leaf/readme
-
-commit 5e641ef551925b28696002c7b22fedfabb5eb4c5
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 11:59:04 2020 +0800
-
-    remove some contents of leaf.md
-
-commit 3caae68533e9786c6a810bfa5ff38df613420a93
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 11:45:07 2020 +0800
-
-    modify leaf/readme and commit 2
-
-```
   
 ### Pull change in sub repo to host repo
 The sub repo maybe get some update by someone others, to sync the change to host repo, need to execute
@@ -173,6 +113,217 @@ git subtree pull -P <path-to-sub-folder> <url-to-repository> <branch-name>
 ```
 note that `git pull` in host repo will only fetch the change made in host repo, if sub repo is changed by someone else, need to execute `git subtree pull` to sync
 
+## Sample - Start from scratch
+###  Add a sub repo
+we have a [host repo](https://github.com/YangLiu1024/HostRepo), its git log shown as below
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit f9dbd6e0d58da75db4895d9fe80256cb45678444 (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:12 2020 +0800
+
+    host commit 4
+
+commit 87e659a42973518f82ea85afd5faa74052805b2d
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:38:32 2020 +0800
+
+    host commit 3
+
+commit 2e3bfaa4924d0d060277b04be2a50a1a7075651c
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:38:07 2020 +0800
+
+    host commit 2
+
+commit 6eb9bba4663bb53eb6acaa361cc7a2567204b666
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:37:23 2020 +0800
+
+    Commit 1
+```
+we have another [leaf repo](https://github.com/YangLiu1024/LeafRepo), its git log shown as below
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log
+commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:31 2020 +0800
+
+    leaf commit 2
+
+commit f95ec87c93de97908603205f83b691f455a94fc7
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:39:31 2020 +0800
+
+    leaf commit 1
+
+commit 281c2586823863b30a65b4a9d6cb8bef06575911
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:39:00 2020 +0800
+
+    Initial commit
+```
+Now, we plan to add leaf repo as sub repository of host repo
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git remote add leaf https://github.com/YangLiu1024/LeafRepo.git
+$ git subtree add -P leaf leaf master
+```
+now, check the history again, you can see that the commits history of `leaf` repo have been merged into `host` repo in <b>chronological order</b>, it just seems like the `leaf` is part of `host` from the beginning, all changed made to `leaf` is actually made to `host`.
+
+note that the commit id is consistent here, because its just a combination of two independent repository.
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit 5322d43436aa94e7799b3e99a453ff594696ed6f (HEAD -> master)
+Merge: f9dbd6e 87bccee
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 16:43:37 2020 +0800
+
+    Add 'leaf/' from commit '87bccee8b4c9c33e811e32c25b7df0378dbdd03c'
+
+    git-subtree-dir: leaf
+    git-subtree-mainline: f9dbd6e0d58da75db4895d9fe80256cb45678444
+    git-subtree-split: 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+
+commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c (leaf/master)
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:31 2020 +0800
+
+    leaf commit 2
+
+commit f9dbd6e0d58da75db4895d9fe80256cb45678444 (origin/master, origin/HEAD)
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:12 2020 +0800
+
+    host commit 4
+
+commit f95ec87c93de97908603205f83b691f455a94fc7
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:39:31 2020 +0800
+
+    leaf commit 1
+
+commit 281c2586823863b30a65b4a9d6cb8bef06575911
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:39:00 2020 +0800
+
+    Initial commit
+
+commit 87e659a42973518f82ea85afd5faa74052805b2d
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:38:32 2020 +0800
+
+    host commit 3
+
+commit 2e3bfaa4924d0d060277b04be2a50a1a7075651c
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:38:07 2020 +0800
+
+    host commit 2
+
+commit 6eb9bba4663bb53eb6acaa361cc7a2567204b666
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:37:23 2020 +0800
+
+    Commit 1
+```
+git will create a remote branch to track `leaf/master`
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git branch -a
+* master
+  remotes/leaf/master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+```
+check the referred commit id for each branch
+```bash
+$ cat .git/refs/heads/master
+5322d43436aa94e7799b3e99a453ff594696ed6f
+$ cat .git/refs/remotes/origin/master
+5322d43436aa94e7799b3e99a453ff594696ed6f
+$ cat .git/refs/remotes/leaf/master
+87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+```
+note that `5322d4` is used to merge last commit `87bcce` of `leaf` and last commit `f9dbd6` of `host`.
+
+### Modify in host repo and push to leaf repo
+do some change to leaf/README.md and README.md and commit, check the log. commit `d08b35` modify both 'leaf/README.md' and 'README.md', commit `6bf080` modify 'leaf/README.md',
+commit `3681da` modify 'README.md'
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit 3681da0b2295159d658242d6fc8191e11e900f44 (HEAD -> master)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:23:42 2020 +0800
+
+    modify README.md from host
+
+commit 6bf08008b33f36e12563fab86463f7502f2d4d64
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit d08b35d71d6c30b95950991f594066ee3f903844
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit 5322d43436aa94e7799b3e99a453ff594696ed6f (origin/master, origin/HEAD)
+Merge: f9dbd6e 87bccee
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 16:43:37 2020 +0800
+
+    Add 'leaf/' from commit '87bccee8b4c9c33e811e32c25b7df0378dbdd03c'
+
+    git-subtree-dir: leaf
+    git-subtree-mainline: f9dbd6e0d58da75db4895d9fe80256cb45678444
+    git-subtree-split: 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+
+commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c (leaf/master)
+```
+push the change to `leaf` repository
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git subtree push -P leaf leaf master
+```
+go to `leaf` repo, pull change, and check its hository, there are two new commits. `822d1b` extract from `d08b35` of `host`, `5a5546` extract from `6bf080` of `host`.
+
+note that `3681da` of `host` is not related to `leaf` folder, so git will not extract from it.
+
+also, that's why the commit id is not consistent, because git need to extract the change related to `leaf` repo within specified commit.
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log
+commit 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit 822d1bfaa9f20345adac50246f23bb1afdee9092
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:31 2020 +0800
+
+    leaf commit 2
+```
+check the referred commit of `leaf/master` in `host`, its has been updated to lastest commit id of `leaf` repository
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ cat .git/refs/remotes/leaf/master
+5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d
+```
 
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
