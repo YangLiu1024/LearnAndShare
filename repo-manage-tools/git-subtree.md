@@ -35,9 +35,9 @@ options for 'add', 'merge', and 'pull'
 Assume that we have a repository [Host repo](https://github.com/YangLiu1024/GitSubTreeTestHostRepo), add we want to split its icons folder to [Split repo](https://github.com/YangLiu1024/GitSubTreeTestSplitRepo), and add a sub repository [Leaf repo](https://github.com/YangLiu1024/GitSubTreeTestLeafRepo).
 
 ### Split sub folder icons
-the command format: `git subtree split --prefix=<path-to-sub-folder> --branch <branch-name> --squash`
+the command format: `git subtree split --prefix=<path-to-sub-folder> --branch <branch-name>`
 
-this command will extract all previously commits of sub folder to generate a new branch which named <branch-name>, `--squash` is optional, which means wrap all previously commits into one commit.
+this command will extract all previously commits of sub folder to generate a new branch which named <branch-name>
   
 for our case, first, cd to `Host repo` folder, then execute
 ```git
@@ -70,6 +70,8 @@ now, the `icons` folder is deleted. Need to change to depend on the new created 
 the command format: `git subtree add -P <path-to-sub-folder> <url-to-repository> <branch-name> --squash`
 
 `<path-to-sub-folder>` is used to store the code of the `<url-to-repository>` with branch `<branch-name>`
+
+`--squash` means merge all commits of `<branch-name>` in `<url-to-repository>` to one commits
 
 for our case,
 ```git
