@@ -324,6 +324,126 @@ yangliu@LT424684 MINGW64 /HostRepo (master)
 $ cat .git/refs/remotes/leaf/master
 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d
 ```
+### Modify in leaf repo and pull from host
+do some change in `leaf` repo, push to remote, and check its log. there are two new commit `56d440` and `aad22a`
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log
+commit aad22a491f6ff9066b01e371e252b0b14d099dc3 (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:50:34 2020 +0800
+
+    modify from leaf 2
+
+commit 56d4401df4f826fd21eaf38dd54c3f627f54e12e
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:50:06 2020 +0800
+
+    modify from leaf 1
+
+commit 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+```
+go to `host` repo, check its log
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit 3681da0b2295159d658242d6fc8191e11e900f44 (HEAD -> master)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:23:42 2020 +0800
+
+    modify README.md from host
+
+commit 6bf08008b33f36e12563fab86463f7502f2d4d64
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit d08b35d71d6c30b95950991f594066ee3f903844
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit 5322d43436aa94e7799b3e99a453ff594696ed6f (origin/master, origin/HEAD)
+Merge: f9dbd6e 87bccee
+```
+then pull `leaf` repo, the modification made in `leaf` has conflict with `host`, fix the conflict and commit again
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git subtree pull -P leaf leaf master
+remote: Enumerating objects: 8, done.
+remote: Counting objects: 100% (8/8), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 6 (delta 1), reused 6 (delta 1), pack-reused 0
+Unpacking objects: 100% (6/6), done.
+From https://github.com/YangLiu1024/LeafRepo
+ * branch            master     -> FETCH_HEAD
+   5a5546c..aad22a4  master     -> leaf/master
+Auto-merging leaf/README.md
+CONFLICT (content): Merge conflict in leaf/README.md
+Automatic merge failed; fix conflicts and then commit the result.
+```
+check its log
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit 1b23fc80203a569a81b3171bceba216ea03dbc92 (HEAD -> master)
+Merge: 3681da0 aad22a4
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:58:28 2020 +0800
+
+    merge leaf repo and fix conflict
+
+commit aad22a491f6ff9066b01e371e252b0b14d099dc3 (leaf/master)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:50:34 2020 +0800
+
+    modify from leaf 2
+
+commit 56d4401df4f826fd21eaf38dd54c3f627f54e12e
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:50:06 2020 +0800
+
+    modify from leaf 1
+
+commit 3681da0b2295159d658242d6fc8191e11e900f44
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:23:42 2020 +0800
+
+    modify README.md from host
+
+commit 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit 6bf08008b33f36e12563fab86463f7502f2d4d64
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit 822d1bfaa9f20345adac50246f23bb1afdee9092
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit d08b35d71d6c30b95950991f594066ee3f903844
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit 5322d43436aa94e7799b3e99a453ff594696ed6f (origin/master, origin/HEAD)
+Merge: f9dbd6e 87bccee
+```
 
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
