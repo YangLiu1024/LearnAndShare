@@ -165,6 +165,7 @@ Date:   Fri Aug 28 16:39:00 2020 +0800
 
     Initial commit
 ```
+![](images/host-leaf-initial.png)
 Now, we plan to add leaf repo as sub repository of host repo
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
@@ -230,6 +231,7 @@ Date:   Fri Aug 28 16:37:23 2020 +0800
 
     Commit 1
 ```
+![](images/host-add-leaf.png)
 git will create a remote branch to track `leaf/master`
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
