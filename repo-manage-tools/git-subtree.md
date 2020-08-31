@@ -299,7 +299,30 @@ push the change to `leaf` repository
 yangliu@LT424684 MINGW64 /HostRepo (master)
 $ git subtree push -P leaf leaf master
 ```
-go to `leaf` repo, pull change, and check its hository, there are two new commits. `822d1b` extract from `d08b35` of `host`, `5a5546` extract from `6bf080` of `host`.
+go to `leaf` repo, pull change, and check its hository, there are two new commits.
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log
+commit 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d (HEAD -> master, origin/master, origin/HEAD)
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:19:27 2020 +0800
+
+    modify leaf/readme from host
+
+commit 822d1bfaa9f20345adac50246f23bb1afdee9092
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:18:11 2020 +0800
+
+    modify leaf/readme and readme from host
+
+commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
+Date:   Fri Aug 28 16:40:31 2020 +0800
+
+    leaf commit 2
+```
+
+`822d1b` extract from `d08b35` of `host`, `5a5546` extract from `6bf080` of `host`.
 
 note that `3681da` of `host` is not related to `leaf` folder, so git will not extract from it.
 
@@ -348,29 +371,8 @@ index 23f8cdb..5e5a433 100644
 +
 +modify from leaf 2
 ```
-
 also, that's why the commit id is not consistent, because git need to extract the change related to `leaf` repo within specified commit.
-```bash
-yangliu@LT424684 MINGW64 /LeafRepo (master)
-$ git log
-commit 5a5546cb5f3309fde92826ea9bc6f5ec5f7a4c2d (HEAD -> master, origin/master, origin/HEAD)
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 17:19:27 2020 +0800
 
-    modify leaf/readme from host
-
-commit 822d1bfaa9f20345adac50246f23bb1afdee9092
-Author: YangLiu1024 <shipiaopiao1115@gmail.com>
-Date:   Fri Aug 28 17:18:11 2020 +0800
-
-    modify leaf/readme and readme from host
-
-commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
-Author: YangLiu1024 <31921184+YangLiu1024@users.noreply.github.com>
-Date:   Fri Aug 28 16:40:31 2020 +0800
-
-    leaf commit 2
-```
 ![](images/host-push-to-leaf.png)
 
 check the referred commit of `leaf/master` in `host`, its has been updated to lastest commit id of `leaf` repository
