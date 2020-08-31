@@ -534,6 +534,8 @@ yangliu@LT424684 MINGW64 /HostRepo (master)
 $ git subtree pull -P leaf leaf master --squash
 ```
 you can find that git subtree merge all commits to `leaf` repo since `87bcce` to latest commit `e86df3` to one new commit `81d143`.
+
+note that the <b>parent</b> of `81d143` is `87bcce`
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
 $ git log
@@ -584,6 +586,7 @@ Date:   Fri Aug 28 16:43:37 2020 +0800
     git-subtree-mainline: f9dbd6e0d58da75db4895d9fe80256cb45678444
     git-subtree-split: 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
 ```
+![](images/host-pull-from-leaf-squash.png)
 
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
