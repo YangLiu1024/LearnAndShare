@@ -505,6 +505,86 @@ Merge: f9dbd6e 87bccee
 ```
 ![](images/host-pull-from-leaf.png)
 
+### Modify in leaf repo and pull from host through --squash
+do some change in leaf repo again, then push the change. there are two new commits, `6b39c3` and `e86df3`
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log
+commit e86df330fd195b27092a82c6fa4d9b468a27622e (HEAD -> master, origin/master, origin/HEAD)
+Author: Yang Liu - YLJC <yang.liu-yljc@asml.com>
+Date:   Mon Aug 31 14:15:26 2020 +0800
+
+    test squash commit 2
+
+commit 6b39c38bf4338c2120f7855f99bce9ebc5db785c
+Author: Yang Liu - YLJC <yang.liu-yljc@asml.com>
+Date:   Mon Aug 31 14:14:57 2020 +0800
+
+    test squash commit 1
+
+commit aad22a491f6ff9066b01e371e252b0b14d099dc3
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:50:34 2020 +0800
+
+    modify from leaf 2
+```
+switch to host repo, pull leaf subtree through `squash`, then fix conflict and commit the merge.
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git subtree pull -P leaf leaf master --squash
+```
+you can find that git subtree merge all commits to `leaf` repo since `87bcce` to latest commit `e86df3` to one new commit `81d143`.
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log
+commit 5ff1bde3dee6ba5eb4865e5cbfe06e72aa949dd2 (HEAD -> master)
+Merge: 1b23fc8 81d1437
+Author: Yang Liu - YLJC <yang.liu-yljc@asml.com>
+Date:   Mon Aug 31 14:29:22 2020 +0800
+
+    merge leaf by through suqash and fix conflict
+
+commit 81d1437a363c5695e991e14b2c37b559b8c4e8d1
+Author: Yang Liu - YLJC <yang.liu-yljc@asml.com>
+Date:   Mon Aug 31 14:26:24 2020 +0800
+
+    Squashed 'leaf/' changes from 87bccee..e86df33
+
+    e86df33 test squash commit 2
+    6b39c38 test squash commit 1
+    aad22a4 modify from leaf 2
+    56d4401 modify from leaf 1
+    5a5546c modify leaf/readme from host
+    822d1bf modify leaf/readme and readme from host
+
+    git-subtree-dir: leaf
+    git-subtree-split: e86df330fd195b27092a82c6fa4d9b468a27622e
+
+commit 1b23fc80203a569a81b3171bceba216ea03dbc92 (origin/master, origin/HEAD)
+Merge: 3681da0 aad22a4
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 17:58:28 2020 +0800
+
+    merge leaf repo and fix conflict
+```
+the start point is store by `git-subtree-split`, now, its value changed from `87bcce` to `e86df3`.
+
+each time `git subtree pull|add` executed, the `git-subtree-split` could be updated.
+
+lets check when first time execute `git subtree add`, the commit log, the `git-subtree-split` is `87bcce`
+```bash
+commit 5322d43436aa94e7799b3e99a453ff594696ed6f
+Merge: f9dbd6e 87bccee
+Author: YangLiu1024 <shipiaopiao1115@gmail.com>
+Date:   Fri Aug 28 16:43:37 2020 +0800
+
+    Add 'leaf/' from commit '87bccee8b4c9c33e811e32c25b7df0378dbdd03c'
+
+    git-subtree-dir: leaf
+    git-subtree-mainline: f9dbd6e0d58da75db4895d9fe80256cb45678444
+    git-subtree-split: 87bccee8b4c9c33e811e32c25b7df0378dbdd03c
+```
+
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
 Just need to sync sub repository at suitable time.
