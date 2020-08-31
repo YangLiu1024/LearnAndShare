@@ -33,3 +33,46 @@ version 需要符合 Eclipse 插件版本的格式: `major.minor.service.qualifi
 qualifer 用于描述不同 build 之间的变化.
 
 ### 插件清单编辑器 - plugin.xml
+'Overview' 页面包含了多个配置区域， 'General Information' 页面显示常规信息。
+
+'Dependencies' 页面显示当前插件对其它插件的依赖，在此页中，必须列出所有该插件项目所需要的第三方插件或插件的包路径。'Required plug-ins' 列表中插件的顺序也是有意义的，此顺序决定了类在运行期间的加载顺序。
+
+'Runtime' 页面包含 'Export Package', 'Package visibility' 和 'Classpath' 三个配置项。 其中 'Export Package' 和 'Package visibility' 是紧密关联的， 'Package visibility' 规定了package 在导出后在插件之间的可见性。 Eclipse 将 package 可见性分为四类： Accessible, Forbidden, Internal, Internal with friends. 'Classpath' 用来添加第三方 jar 文件到 classpath，一般不建议使用.
+
+'Extensions' 用来扩展其它插件提供的扩展点，以达到只需要通过配置，不需要写代码，就实现所需功能的目的。如果使用了某个插件提供的扩展点，那么就需要在 'Dependencies' 中添加该插件作为依赖。
+
+'Extension Points' 用来定义插件自己的扩展点，需要创建一个扩展点的配置文件，并且编写程序来加载创建的扩展点和解析扩展点中的配置信息，编写业务逻辑程序处理这些配置。
+
+'Build' 页面中， 'Runtime Information' 列出所有要构建的库以及它关联的源文件目录。 'Binary Build' 用来选择需要打包到插件中的所有文件和文件夹， 'Source Build'一般不使用。
+
+'MANIFEST.MF', 'plugin.xml' 和 'build.properties' 几个文本编辑页面一般不需要手动修改，它们会通过前面的页面内容自动同步更新
+
+### RCP Avtivator 和 Advisor 类解析
+当我们 create project based on templates, 会自动生成一些 Java 类，这几个类在 RCP 程序中起到了非常重要的作用。
+#### Activator
+Activator 类是在创建 RCP 程序向导中创建的，用来控制插件的生命周期，
+* 如果该插件面向的是 OSGi 框架，那么Activator 类将继承 `org.osgi.framework.BundleActivator` 接口
+* 如果该插件是non-ui 插件，那么 Activator 将继承 `org.eclipse.core.runtime.Plugin` 类
+* 如果该插件是 UI 插件(含有 SWT, JFace 等)，那么Activator 类将继承 `org.eclipse.ui.plugin.AbstractUIPlugin`
+
+其中最重要的两个接口，是定义在 BundleActivator中的 `start(BundleContext context)` 和 `stop(BundleContent context)`，将在插件启动，关闭的时候调用。
+
+一个插件只能在 Manifest 中定义一个 BundleActivator, Fragment 类型的插件不需要拥有 BundleActivator.
+
+#### Application
+Application 实现 `org.eclipse.equinox.app.IApplication` 接口，该类是 RCP 程序的主要入口。虽然这个类提供了启动和停止应用的两个 public 接口， 但是不需要自己来调用启动和停止操作，框架平台会调用它们。 并且，需要扩展 `org.eclipse.core.runtime.applications` 扩展点来定义一个 application，在该扩展点的 class setting 中，指定创建的实现了 `org.eclipse.equinox.app.IApplication` 的类。 该 application 扩展点会在 product 扩展点配置中使用，将 application 扩展点和 product 扩展点绑定在一起。
+
+#### WorkbenchAdvisor
+用于配置工作台的类，执行一些初始化的工作， 并且 WorkbenchAdvisor 在创建工作台之前创建并完成初始化，一般在 Application start 方法中创建。
+
+#### WorkbenchWindowAdvisor
+WorkbenchAdvisor 中 createWorkbenchWindowAdvisor 接口需要返回一个 WorkbenchWindowAdvisor实现类，在该实现类中初始化 window 相关的一些配置，以及创建 ActionBarAdvisor
+
+#### ActionBarAdvisor
+ActionBarAdvisor 用来负责应用程序的顶级菜单，工具栏和状态行的显示以及 Action的创建。
+```java
+protected void makeActions(IWorkbenchWindow window)//used to create actions, and use register(Action) to regist the actions
+protected void fillMenuBar(IMenuManager menuBar)//used to populate menu bar
+protected void fillCoolBar(ICoolBarMenuManager coolBar)//used to populate toolbar
+protected void fillStatusLine(IStatusLineManager statusLine)//used to populate status line
+```
