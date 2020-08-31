@@ -303,6 +303,52 @@ go to `leaf` repo, pull change, and check its hository, there are two new commit
 
 note that `3681da` of `host` is not related to `leaf` folder, so git will not extract from it.
 
+and lets check the diff between the related commits `d08b35` and `822d1b`.
+
+you can find that the commit `d08b35` in `host` modify two files: 'README.md' and 'leaf/README.md', and the commit `822d1b` only modify the 'leaf/README.md'.
+```bash
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git diff d08b35
+diff --git a/README.md b/README.md
+index 38573f1..7921539 100644
+--- a/README.md
++++ b/README.md
+@@ -6,5 +6,3 @@ host commit 2
+ host commit 3
+
+ host commit 4
+-
+-modify from host 1
+diff --git a/leaf/README.md b/leaf/README.md
+index 23f8cdb..5e5a433 100644
+--- a/leaf/README.md
++++ b/leaf/README.md
+@@ -4,4 +4,6 @@ leaf commit1
+
+ leaf commit 2
+
+-modify from host 1
++modify from leaf 1
++
++modify from leaf 2
+```
+```bash
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git diff 822d1b
+diff --git a/README.md b/README.md
+index 23f8cdb..5e5a433 100644
+--- a/README.md
++++ b/README.md
+@@ -4,4 +4,6 @@ leaf commit1
+
+ leaf commit 2
+
+-modify from host 1
++modify from leaf 1
++
++modify from leaf 2
+```
+
 also, that's why the commit id is not consistent, because git need to extract the change related to `leaf` repo within specified commit.
 ```bash
 yangliu@LT424684 MINGW64 /LeafRepo (master)
