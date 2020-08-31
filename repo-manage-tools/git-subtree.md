@@ -292,6 +292,8 @@ Date:   Fri Aug 28 16:43:37 2020 +0800
 
 commit 87bccee8b4c9c33e811e32c25b7df0378dbdd03c (leaf/master)
 ```
+![](images/push-change-in-host.png)
+
 push the change to `leaf` repository
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
@@ -323,6 +325,8 @@ Date:   Fri Aug 28 16:40:31 2020 +0800
 
     leaf commit 2
 ```
+![](images/host-push-to-leaf.png)
+
 check the referred commit of `leaf/master` in `host`, its has been updated to lastest commit id of `leaf` repository
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
@@ -352,6 +356,8 @@ Date:   Fri Aug 28 17:19:27 2020 +0800
 
     modify leaf/readme from host
 ```
+![](images/push-change-in-leaf.png)
+
 go to `host` repo, check its log
 ```bash
 yangliu@LT424684 MINGW64 /HostRepo (master)
@@ -449,6 +455,7 @@ Date:   Fri Aug 28 17:18:11 2020 +0800
 commit 5322d43436aa94e7799b3e99a453ff594696ed6f (origin/master, origin/HEAD)
 Merge: f9dbd6e 87bccee
 ```
+![](images/host-pull-from-leaf.png)
 
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
