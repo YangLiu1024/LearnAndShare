@@ -106,6 +106,19 @@ $ cat local_manifests/local_manifest.xml
         <remove-project name="YangLiu1024/GitSubTreeTestSplitRepo"></remove-project>
 </manifest>
 ```
+if you check the manifest file which used by repo client here, you can execute `repo manifest`, and find that it print the merged manifest.xml instead of original one.
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo manifest
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remote fetch="https://github.com" name="github"/>
+
+  <default remote="github" revision="refs/heads/master" sync-j="4"/>
+
+  <project name="YangLiu1024/GitSubTreeTestHostRepo" path="host"/>
+</manifest>
+```
 
 ### Initialize the git-repo
 when manifest repository is ready, its time to initialize our repo work space.
