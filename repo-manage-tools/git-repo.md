@@ -46,7 +46,11 @@ the `<manifest>` is the root element.
 
 `<remote>` is used to config remote repository, could be multiple.
   - `name` is the name of remote repository, should be unique in this xml among all remotes. the name here will be used as remote name after `repo sync` for the project download from this remote, in another word, its equal to `git remote add <remote.name> <remote.fetch + project.name>` for each project.
-  - `fetch` is the prefix of repository address, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name` + `.git`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo.git` for leaf repo
+  - `fetch` is the prefix of repository address, shared by one or more projects which use this remote, when connect to sub repository, the final used URL will be `remote.fetch` + `project.name` + `.git`, in my case, it will be `https://github.com/YangLiu1024/GitSubTreeTestLeafRepo.git` for leaf repo
+  - `review` is the host name of 'Gerrit' server where reviews are uploaded by `repo upload`. This attribute is optional, if not specified, `repo upload` will not function
+  - `alias` if specified, is used to override `name` to be set as the remote name in each projects. Its value could be duplicate while `name` must be unique in the manifest.xml. This help each project to be able to have same remote name which actually points to different remote.
+  - `revision` is the name of git branch, such as 'master' or 'refs/heads/master', if specifed, will override the default revision in `<default>`
+  - `pushurl` is the git 'push' prefix for all projects which use this remote, is optional.
 
 `<project>` is used to config each sub repository
   - `name` the name of sub repository
@@ -54,7 +58,14 @@ the `<manifest>` is the root element.
   - `remote` the remote defined in `<remote>`
   - `revision` the branch name
   
-`<default>` is used to defined the default value for project attribute if its not defined in `<project>`
+`<default>` is used to defined the default value for `project` element if its attribute is not defined, and there is at most one default element.
+ - `revision` is the name of git branch, used when neither <project> nor its 'remote' does not specify 'revision'
+ - `remote` is the name of previously defined remote element
+ - `dest-branch` is the name of git branch, if not set, `project` will use 'revison' by default
+ - `sync-j` is the number of parallel jobs to use when syncing
+ - `sync-c` set to true to only sync the specified git branch rather than whole ref space
+ - `sync-s` set to true to also sync sub-projects
+ - `sync-tags` set to false to only sync the specified git branch rather than the other ref tags
 
 more information about manifest format, please refer to [manifest format](https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.md)
 
