@@ -272,6 +272,8 @@ if you want to create responding remote branch, you can execute `git push -u git
 
 if does not add '-u' here, you need to execute `git branch --set-upstream-to github/${branch-name}` to change `git pull` binding from remote/${revision} to remote/${branch-name}
 
+if you want to push the change of local ${branc-name} to remote/${revision}, you need to execute `git push github HEAD:${revision}`
+
 ```git
 $ .repo/repo/repo start modify-through-repo leaf split
 $ .repo/repo/repo status
