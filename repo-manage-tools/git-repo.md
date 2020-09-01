@@ -81,6 +81,7 @@ the `<manifest>` is the root element.
  `linkfile` is just like `copyfile`, instead of copying, it create a symlink.
  
  `remove-project` is used to delete the named project from the internal manifest table, possibly allowing a subsequence project element in the same manifest file to replace the project with a different source. this element is mostly used in a local manifest file, where the user can remove a project, and possibly replace it with their own definition.
+  - `name` the name of project
  
  `include` provides the capability of including another manifest file into the originating manifest. Normal rules apply for the target manifest to include - it must be a usable manifest on its own.
   - `name` the manifest to include, specifed relative to the manifest repository's root.
