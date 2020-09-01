@@ -51,12 +51,6 @@ the `<manifest>` is the root element.
   - `alias` if specified, is used to override `name` to be set as the remote name in each projects. Its value could be duplicate while `name` must be unique in the manifest.xml. This help each project to be able to have same remote name which actually points to different remote.
   - `revision` is the name of git branch, such as 'master' or 'refs/heads/master', if specifed, will override the default revision in `<default>`
   - `pushurl` is the git 'push' prefix for all projects which use this remote, is optional.
-
-`<project>` is used to config each sub repository
-  - `name` the name of sub repository
-  - `path` when execute `repo sync`, the relative path to root directory, and the code in sub repository will be downloaded to this sub folder
-  - `remote` the remote defined in `<remote>`
-  - `revision` the branch name
   
 `<default>` is used to defined the default value for `project` element if its attribute is not defined, and there is at most one default element.
  - `revision` is the name of git branch, used when neither <project> nor its 'remote' does not specify 'revision'
@@ -67,7 +61,56 @@ the `<manifest>` is the root element.
  - `sync-s` set to true to also sync sub-projects
  - `sync-tags` set to false to only sync the specified git branch rather than the other ref tags
 
+`<project>` is used to describle a single git repository to be cloned into the repo client workspace, could be multiple
+  - `name` the name of sub repository, the name will be appeded onto its remotes fetch URL to generate the actual URL of git repository. its format will be `${remote.fetch}/${project.name}.git`
+  - `path` when execute `repo sync`, the relative path to top directory of repo client work space, and the code in sub repository will be downloaded to this sub folder. if not specifed, the `project.name` will be used
+  - `remote` the name of previously defined remote element
+  - `revision` the branch name, could be relative to 'refs/heads', such as 'master', or absolute, such as 'refs/heads/master'. if not specifed in `project`, use the one defined in its responding `remote`. if still absent, use the one defined in `default`
+  - `dest-branch` the name of git branch. when using `repo upload`, changes will be submitted for code review on this branch. if unspecified both here and in the default element, `revision` is used instead
+  - `groups` list of groups to which this project belongs, whitespace or comma separated. all projects belong to the group `all`, and each project automatically belong to a group of its name:`name` and path:`path`
+  - `clone-depth` set the depth to use when fetching the this project. if specifed, this value will override any value given to `repo init` with the `--depth` on the command line
+  
+`extend-project` is used to modify the atrributes of named project. this element is mostly used in a local manifest file, to modify the attributes of an existing project without completely replacing the existing project definition. this makes the local manifest more robust against changes to the original manifest
+ - `path` if specifed, limit the change to projects checked out at the specified path, rather than all projects with the given name
+ - `groups` list of additional groups to which this projects belongs.
+ - `revision` if specified, override the revision of the original `project`
+ - `remote` if specifed, override the remote of original `project`
+ 
+ `copyfile` used as children of `project` element, could be zero or multiple. Each element describle a 'src-dest' pair of files, the 'src' file will be copied to the 'dest' place during `repo sync` command. 'src' is project relative, 'dest' is relative to the top of the tree. Copying from paths outside of the project or paths outside of the repo client is not allowed. 'src' and 'dest' must be files. Directory or symlinks are not allowed. Parent directories of 'dest' will be automatically created if missing
+ 
+ `linkfile` is just like `copyfile`, instead of copying, it create a symlink.
+ 
+ `remove-project` is used to delete the named project from the internal manifest table, possibly allowing a subsequence project element in the same manifest file to replace the project with a different source. this element is mostly used in a local manifest file, where the user can remove a project, and possibly replace it with their own definition.
+ 
+ `include` provides the capability of including another manifest file into the originating manifest. Normal rules apply for the target manifest to include - it must be a usable manifest on its own.
+  - `name` the manifest to include, specifed relative to the manifest repository's root.
+
 more information about manifest format, please refer to [manifest format](https://gerrit.googlesource.com/git-repo/+/master/docs/manifest-format.md)
+
+### Local Manifests
+Additional remotes and projects may be added through local manifest file which stored in `${repo client}/.repo/local_manifests/*.xml`
+
+user may add projects to the local manifest prior to a `repo sync` invocation, instructing repo to automatically download and manage these extra projects.
+
+manifest files store in `${repo client}/.repo/local_manifests/*.xml` will be loaded in alphabetical order.
+
+note that a `local_manifest.xml` could exist under `${repo client}/.repo/`, this method is deprecated in favor of using multiple manifest files as mentioned above. if it exist, it will be loaded before any manifest files stored in `${repo client}/.repo/local_manifests/*.xml`
+
+A simple sample
+```bash
+$ ls .repo/local_manifests
+local_manifest.xml
+another_local_manifest.xml
+
+$ cat .repo/local_manifests/local_manifest.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project path="manifest"
+           name="tools/manifest" />
+  <project path="platform-manifest"
+           name="platform/manifest" />
+</manifest>
+```
 
 ### Initialize the git-repo
 when manifest repository is ready, its time to initialize our repo work space.
