@@ -99,17 +99,11 @@ note that a `local_manifest.xml` could exist under `${repo client}/.repo/`, this
 
 A simple sample
 ```bash
-$ ls .repo/local_manifests
-local_manifest.xml
-another_local_manifest.xml
-
-$ cat .repo/local_manifests/local_manifest.xml
-<?xml version="1.0" encoding="UTF-8"?>
+yangliu@LT424684 MINGW64 /git-repo-demo/.repo
+$ cat local_manifests/local_manifest.xml
 <manifest>
-  <project path="manifest"
-           name="tools/manifest" />
-  <project path="platform-manifest"
-           name="platform/manifest" />
+        <remove-project name="YangLiu1024/GitSubTreeTestLeafRepo"></remove-project>
+        <remove-project name="YangLiu1024/GitSubTreeTestSplitRepo"></remove-project>
 </manifest>
 ```
 
