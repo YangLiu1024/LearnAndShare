@@ -29,7 +29,9 @@ when execute the `repo` command, the script will download the real repository `h
 ### Manifest repository
 The information about how to manage multiple repository and all configuration of sub repository is stored in an independent repository, which usually called `manifest`.
 
-And within this manifest repository, a file named `default.xml` is required. All configuration information store in this file.
+And within this manifest repository, a file named `default.xml` is required, its the default manifest file. All configuration information store in this file.
+
+If it does not exist, when execute `repo init`, need to specify option `-m` to select the manifest file name. 
 
 A simple example, refer to [Manifest repo](https://github.com/YangLiu1024/GitRepoManifestRepo)
 ```xml
