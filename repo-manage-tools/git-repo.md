@@ -158,10 +158,11 @@ repo sync -f -d -m <selected-manifest-file-name> <projects>...
 after this command, all or specifed sub repository defined in `default.xml` will be downloaded to our work space,the file structure shown as below.
 
 note that when specify project name, `repo sync <project>`
-* if this project has never been synced before, its equal to `git clone`, all branches in remote repository will be copied to local project directory
-* if this project has been synced before, then its equal to `git remote update; git rebase`, it will use currently checked-out branch in the local project directory to rebase. 
+* if this project has never been synced before, its almost equal to `git clone`, all branches in remote repository will be copied to local project directory, but there is no local branch
+* if this project has no local branch or do nothing change yet, simply pull the latest project to project folder
+* if this project has some commits already, then its equal to `git remote update; git rebase`, it will use currently checked-out branch in the local project directory to rebase. 
   - if the local branch isn't tracking a remote branch, then no synchronization occurs for the project
-  - if the git rebase operation result in merge conflicts, use normal git command, such as git rebase --continue, to resolve the conflicts
+  - if the git rebase operation result in merge conflicts, fix conflict first, then `git add`, finally use `git rebase --continue`, to resolve the conflicts
   
 ```git
 $ ls -al
