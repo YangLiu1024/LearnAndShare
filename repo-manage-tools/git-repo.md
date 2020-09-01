@@ -264,12 +264,18 @@ repo start <new-branch-name> [--all | <project>...]
 ```
 `<project>` could be `project.name` or `project.path` defined in manifest file
 
-this command will create new branch for all or specifed projects, <b>and the new created branch is based on the branch defined in manifest file and track this remote branch automaticly</b>
+this command will create new branch for all or specifed projects and switch to this branch automatically, <b>and the new created branch is created based on the ${revision} branch defined in manifest file and it will track this remote branch on `git pull` automatically, but `git push` is not</b>
+
+if you want to create responding remote branch, you can execute `git push -u github ${branch-name}`, then a new remote branch with same name will be created.
+
+'-u' here is used to set upstream binding, the local branch will bind to responding remote branch on `git pull` and `git push`.
+
+if does not add '-u' here, you need to execute `git branch --set-upstream-to github/${branch-name}` to change `git pull` binding from remote/${revision} to remote/${branch-name}
 
 ```git
 $ .repo/repo/repo start modify-through-repo leaf split
 $ .repo/repo/repo status
-project split/                                  branch modify-through-repo
+project split/                                  branch modify-through-repo${}
  -d     settings-16.png
 project leaf/                                   branch modify-through-repo
  -m     leaf.md
