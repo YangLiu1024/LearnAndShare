@@ -383,6 +383,24 @@ removed projects :
         leaf at revision refs/heads/master
         split at revision refs/heads/master
 ```
+### Display unmerged branch
+`repo overview` command is used to display an overview of the projects branches, and list any local commits that have not yet been merged into the project.
+
+by default, all branchs are displayed, and option `-b` to restrict the output to only currently checked out branch of each project
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo overview
+Deprecated. See repo info -o.
+Projects Overview
+
+project host/
+* test-branch                       ( 1 commit , Wed Sep 2 14:52:58 2020 +0800)
+                                      - 9b4bc7ce test repo overview
+```
+note that this command is deprecated, instead you can use `repo info -o`
+
+### Rebase with upstream branch
+`repo rebase [<project>...]` command rebase local branches on upstream branch
 
 ## Common Error
 ### Symlinks
