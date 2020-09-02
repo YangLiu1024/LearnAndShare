@@ -301,6 +301,89 @@ repo manifest
 ```
 this command will print current used manifest file
 
+### List projects and their associated directories
+execute `repo list` to display project folder path and its responding project name
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo list
+host : YangLiu1024/GitSubTreeTestHostRepo
+```
+
+### Get info on the branch
+execute `repo info` to get info on the manifest branch, current branch or unmerged branches
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo info
+Manifest branch: refs/heads/master
+Manifest merge branch: refs/heads/master
+Manifest groups: all,-notdefault
+----------------------------
+Project: YangLiu1024/GitSubTreeTestHostRepo
+Mount path: C:/Localdata/YangLiusoftware/git/Git/git-repo-demo/host
+Current revision: 7fe624869a051ca79fff82216b222fc1ea15214b
+Current branch: master
+Manifest revision: refs/heads/master
+Local Branches: 1 [master]
+----------------------------
+```
+
+### Delete branch
+execute `repo abandon [--all | <branch_name>] [<project>...]` to abandon the branch permanently(including its all history) from your local repository.
+
+its equal to `git branch -D <branch_name>`. note that `-all` means delete all branches for specified projects
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo info
+Manifest branch: refs/heads/master
+Manifest merge branch: refs/heads/master
+Manifest groups: all,-notdefault
+----------------------------
+Project: YangLiu1024/GitSubTreeTestHostRepo
+Mount path: C:/Localdata/YangLiusoftware/git/Git/git-repo-demo/host
+Current revision: 7fe624869a051ca79fff82216b222fc1ea15214b
+Current branch: test-branch
+Manifest revision: refs/heads/master
+Local Branches: 2 [master, test-branch]
+----------------------------
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo abandon test-branch host
+Abandoned branches:
+test-branch              | host
+
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo branch
+   master                    | in all projects
+
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ cd host/
+
+yangliu@LT424684 MINGW64 /git-repo-demo/host ((7fe6248...))
+$ git status
+HEAD detached at 7fe6248
+nothing to commit, working tree clean
+
+yangliu@LT424684 MINGW64 /git-repo-demo/host ((7fe6248...))
+$ git branch
+* (HEAD detached at 7fe6248)
+  master
+```
+### Checkout branch
+`repo checkout <branch_name> [<project>...]` checks out an exsiting branch that was previously created by `repo start`
+
+This command is equal to `repo forall [<project>...] -c git checkout <branch_name>`
+
+### Diff manifest
+`repo diffmanifests manifest1.xml [manifest2.xml] [options]` show the difference between projects revisions of manifest1 and manifest2. if manifest2 is not specified, current manifest.xml will be used instead.
+```bash
+yangliu@LT424684 MINGW64 /git-repo-demo
+$ .repo/repo/repo diffmanifests .repo/manifests/default.xml
+
+removed projects :
+
+        leaf at revision refs/heads/master
+        split at revision refs/heads/master
+```
+
 ## Common Error
 ### Symlinks
 Repo will use symlinks heavily internally. On *NIX platforms, this isn't an issue, but Windows makes it a bit difficult.
