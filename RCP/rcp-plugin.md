@@ -76,3 +76,26 @@ protected void fillMenuBar(IMenuManager menuBar)//used to populate menu bar
 protected void fillCoolBar(ICoolBarMenuManager coolBar)//used to populate toolbar
 protected void fillStatusLine(IStatusLineManager statusLine)//used to populate status line
 ```
+
+### RCP Product Export
+基于 Eclipse 的产品是使用 Eclipse 平台构建的独立程序。产品可以作为一个或多个插件打包，交付。PDE(plugin development environment) 使用产品配置文件来管理产品的配置信息，包括产品的启动页面，图标显示等。 Eclipse 提供产品的导出功能，使 RCP 产品能够脱离 Eclipse 开发环境独立运行。可以基于当前已有的 product 创建一个产品配置文件，该文件需要以 `.project` 结尾。
+
+#### Product configuration file
+产品编辑页面与插件清单编辑页面类似，有多个配置页。
+ - `Overview` 页面定义了产品的基本信息, 其中 `the product includes native launcher artifacts` 表示导出后创建可执行文件
+ - `Contents` 页面展示了当前产品依赖的所有其它插件，可以使用'Add required Plug-ins' 来确保没有遗失依赖项
+ - `Configuration` 定义产品运行时需要的配置文件，这个文件一般会在 ${product_folder}/configurations/config.ini. 配置文件里一般会指定 osgi.bundles(所有的依赖项), osgi.bundles.defaultStartLevel(插件启动时采用的默认启动级别，默认为4). osgi.product(指定要启动的产品的标识符), osgi.splashPath(启动页面的路径)。除了配置文件，还需要配置插件的 'Start Level',比如有的插件必须优先自动启动，那么就要在这里配置好。
+ - `Launching` 指定运行时执行环境，启动参数等
+ - `Splash` 设置产品启动页面图片，名为 splash.bmp, 需要放在插件的根目录下
+ #### Synchronize function
+ 在 `Overview` 页面有一个`Synchronize` 功能。需要知道，产品配置文件只是一个辅助功能，用于设置产品相关配置。而应用程序真正运行时并不是依靠读取这个产品配置文件来执行的，需要将产品配置文件中的信息同步到插件的 `plugin.xml` 中，这就是同步操作的作用，它确保产品配置文件中的内容和插件 `plugin.xml` 同步，产品配置文件的保存功能不会触发同步。
+ #### Launch product and Launch application
+ 插件页面和产品配置页面都提供了运行链接，但是它们还是有一些区别的。在插件概述页面的运行称为 application 运行，在产品概述页面的运行称为 product 运行。应用运行决定了开发阶段应用程序的运行状况，产品运行决定了产品最终导出后在实际环境中的运行状况。
+ #### Common Error for export
+  - `product can not been found` => 查看产品是否包含所有依赖项
+  - `splash or other icons are missing` => 查看 build.properties 里是否包含了所有需要的文件
+  - `service could not been found or injected` => 确保提供 service 的 插件启动了'Activate the plug-in when one of its class is loaded', 然后确保 org.apache.felix.src 应该 auto start, 并且 start-level < 4
+  - `application id could not been found` => org.eclipse.core.runtime 插件要auto start， 并且 start-level 要为 1
+ 
+ 
+
