@@ -97,5 +97,142 @@ protected void fillStatusLine(IStatusLineManager statusLine)//used to populate s
   - `service could not been found or injected` => 确保提供 service 的 插件启动了'Activate the plug-in when one of its class is loaded', 然后确保 org.apache.felix.src 应该 auto start, 并且 start-level < 4
   - `application id could not been found` => org.eclipse.core.runtime 插件要auto start， 并且 start-level 要为 1
  
+ ## RCP Extensions
+ 通过对 Extension 的使用，可以快速的完成功能开发。
+ ### Product 扩展
+ 为了定义一个 product,需要扩展 org.eclipse.core.runtime.products, 这个扩展可以定义一个 `product`，product 需具有 id 以及其它 property
  
+ 这儿的 id 为 'product', 最后完整的 product id 为 plugin id + id here. for example, the plugin id is `com.rcp.plugin.app`, 那么对应的 product id 就是 `com.rcp.plugin.app.product`
+ ```xml
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            name="%product.name"
+            application="com.rcp.plugin.app.application">
+         <property
+               name="windowImages"
+               value="icons/eclipse16.png,icons/eclipse32.png,icons/eclipse48.png,icons/eclipse64.png, icons/eclipse128.png,icons/eclipse256.png">
+         </property>
+         <property
+               name="appName"
+               value="%product.name">
+         </property>
+      </product>
+   </extension>
+```
+### Application 扩展
+每个 product 需要指定一个 Application，为了定义 Application，需要扩展 org.eclupse.core.runtime.applications
+```xml
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.rcp.plugin.app.intro.Application">
+         </run>
+      </application>
+   </extension>
+```
+其中 class 指定了具体的实现了 org.eclipse.equinox.app.IApplication 的类，这个类是整个 application的入口类，类似于 Java 程序的 main 方法。
+
+与 product id 类似，这儿的 id 为 'application', 最后的 application id 为 `com.rcp.plugin.app.application`, 并且在 product 扩展中被使用。
+### Commands 扩展
+Commands 扩展用来定义各种 command, 每个command 还可以包含多个 commandParameter. 这儿的 command 可以被 menu item 或者 toolbar item 引用. 同样的，每个 command 需要有自己 unique id.
+```xml
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="com.rcp.plugin.app.command.language"
+            name="Language">
+         <commandParameter
+               id="com.rcp.plugin.app.language.locale"
+               name="locale"
+               optional="true">
+         </commandParameter>
+      </command>
+   </extension>
+```
+这里定义了一个 'com.rcp.plugin.app.command.language' command, 且这个 command 拥有一个 parameter， 其 id 为 'com.rcp.plugin.app.language.locale'。
+
+Eclipse 提供了很多内置的 action 以及对应的 command id, 可以参考 class ActionFactory
+### Menus 扩展
+Menus 扩展用来定义各种菜单栏，工具栏等。它由元素 `menuContribution` 组成，每一个 menuContribution 元素需要指定 'locationURI', 它标志着该 menuContribution 元素对应的内容需要被添加到什么位置。它的格式为 `menu-schema:menu-id?<placement>=<menu-item-id>`, 更详细点， 就是 `[menu|toolbar|popup]:[existing menu id: existing view id]?[before|after|endof]=[the existing menu item id]`。menu-schema 是用来指定要找哪种类型的 menu, 后面跟着指定的 menu 的 id. placement 是指需要放在指定 menu-item 的相对位置。placement 并不能完全保证相对位置，它更多的取决于插件的加载顺序。
+
+Each 'menuContribution' 可以包含多个 'command', 'dynamic', 'menu', 'toolbar', 'separator' 元素
+```xml
+<extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:help?after=additions">
+         <menu
+               id="com.rcp.plugin.app.menu.language"
+               label="Language"
+               mnemonic="L">
+            <command
+                  commandId="com.rcp.plugin.app.command.language"
+                  id="com.rcp.plugin.app.language.zh"
+                  label="Chinese"
+                  style="push">
+               <parameter
+                     name="com.rcp.plugin.app.language.locale"
+                     value="zh_CN">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.rcp.plugin.app.command.language"
+                  id="com.rcp.plugin.app.language.en"
+                  label="English"
+                  style="push">
+               <parameter
+                     name="com.rcp.plugin.app.language.locale"
+                     value="en">
+               </parameter>
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.rcp.plugin.app.toolbar.save.actions">
+            <command
+                  commandId="org.eclipse.ui.file.save"
+                  disabledIcon="icons/disable-save-24.png"
+                  icon="icons/save-16.png"
+                  label="Save"
+                  style="push"
+                  tooltip="Save">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.file.saveAll"
+                  disabledIcon="icons/disabled-save-all-16.png"
+                  icon="icons/save-all-16.png"
+                  label="SaveAll"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+```
+for example, 第一个 menuContribution 的 locationURI 是 'menu:help?after=additions' 表示要去找 help menu, 它的 id 是 help,它是在我们 ApplicationActionBarAdvisor 里注册的
+```java
+	@Override
+  protected void fillMenuBar(IMenuManager menuBar) {
+		MenuManager helpMenu = new MenuManager(Messages.ApplicationActionBarAdvisor_HELP, IWorkbenchActionConstants.M_HELP);
+		menuBar.add(helpMenu);
+	}
+```
+然后 'additions' 是一个特殊的 id, 表示 'other menu item', 这个 URI 的意思就是将去查找 id 为 help 的 menu，将自己 menuContribution 的元素添加到这个 menu 其它已有的 item 之前。
+
+之后，在该 menuContribution 元素里添加一个 menu 元素，该元素有自己的 id, 可以被用在其它的 locationURI里。 在 menu 元素里， 添加了两个command 元素。 每个command 元素表示一个 menu item, 每一个 menu item 需要和一个 command id绑定，表示当用户点击该 menu item 时，触发该 command id. 当该 command id 需要参数时，可以在该 command 元素里添加 parameter 元素，该元素指定一个 commandParameter id 和一个对应的 value. 这样，当触发该 menu item 对应的 command id 时，会将该 parameter value 传递出去，然后在该 command id 对应的 handler 里面，可以读取该参数并继续处理。
+```java
+public class SwitchLanguageHandler extends AbstractHandler {
+   public Object execute(ExecutionEvent event) throws ExecutionException {
+    System.out.print(event.getParameter("com.rcp.plugin.app.language.locale"));
+   }
+}
+```
+第二个 locationURI 是 'toolbar:org.eclipse.ui.main.toolbar?after=additions', 这里的 'org.eclipse.ui.main.toolbar' 是内置的 toolbar id， 表示 main toolbar. 还有 'org.eclipse.ui.main.menu', 表示 main menu. 之后，在 main toolbar 里面添加了一个 toolbar, 这个 toolbar 里面添加了两个 command 元素，这两个 command 也和内置的 command id 'org.eclipse.ui.file.save' 和 'org.eclipse.ui.file.saveAll' 绑定在一起。这两个 command id 会在视图触发 p.firePropertyChange(ISaveablePart.PROP_DIRTY)) 事件时更新状态。
 
