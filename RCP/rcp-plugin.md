@@ -234,5 +234,249 @@ public class SwitchLanguageHandler extends AbstractHandler {
    }
 }
 ```
-第二个 locationURI 是 'toolbar:org.eclipse.ui.main.toolbar?after=additions', 这里的 'org.eclipse.ui.main.toolbar' 是内置的 toolbar id， 表示 main toolbar. 还有 'org.eclipse.ui.main.menu', 表示 main menu. 之后，在 main toolbar 里面添加了一个 toolbar, 这个 toolbar 里面添加了两个 command 元素，这两个 command 也和内置的 command id 'org.eclipse.ui.file.save' 和 'org.eclipse.ui.file.saveAll' 绑定在一起。这两个 command id 会在视图触发 p.firePropertyChange(ISaveablePart.PROP_DIRTY)) 事件时更新状态。
+第二个 locationURI 是 'toolbar:org.eclipse.ui.main.toolbar?after=additions', 这里的 'org.eclipse.ui.main.toolbar' 是内置的 toolbar id， 表示 main toolbar. 还有 'org.eclipse.ui.main.menu', 表示 main menu. 
+
+之后，在 main toolbar 里面添加了一个 toolbar, 这个 toolbar 里面添加了两个 command 元素，这两个 command 也和内置的 command id 'org.eclipse.ui.file.save' 和 'org.eclipse.ui.file.saveAll' 绑定在一起。这两个 command id 会在视图触发 p.firePropertyChange(ISaveablePart.PROP_DIRTY)) 事件时更新状态。
+```java
+public abstract class BaseEditorPart extends EditorPart {
+
+  protected IDirtyable dirtyable = new Dirtyable(
+      DirtyListener.createWeak(this, p -> p.firePropertyChange(ISaveablePart.PROP_DIRTY)));
+
+  @Override
+  public boolean isDirty() {
+    return dirtyable.isDirty();
+  }
+
+  @Override
+  public void doSave() {
+  }
+
+  @Override
+  public void doSave() {
+  }
+}
+```
+当用户选中当前视图，且该视图实现了 ISaveablePart, such as EditorPart, eclipse 会根据该视图的 isDirty() 来判断是否应该 enable 'org.eclipse.ui.file.save', 如果用户点击了该 command, 那么就会调用对应的 doSave 方法。
+
+当用户切换视图，eclipse 总会根据当前视图的 isDirty 来更新 command status. 当用户在当前视图 do some change, and want to trigger dirty, 仅仅让 isDirty 方法返回 true 是不够的，并不会理解刷新 command status， 需要执行 p.firePropertyChange(ISaveablePart.PROP_DIRTY) 来触发 command status update. 同样的，在 save 之后想让 dirty 消失，仅仅让 isDirty 返回 false 也是不够的，也需要执行 p.firePropertyChange(ISaveablePart.PROP_DIRTY) 来触发 command status update。
+
+### Handler 扩展
+每一个 command id 在被触发时，需要一个对应的 handler 来响应
+```xml
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.rcp.plugin.app.language.SwitchLanguageHandler"
+            commandId="com.rcp.plugin.app.command.language">
+      </handler>
+   </extension>
+```
+每一个 handler 都需要实现 org.eclipse.core.commands.AbstractHandler, 当对应的 command id 被触发时，就会执行对应的 handler
+
+### ViewPart 扩展
+当想自定义一个视图时，需要扩展 org.eclipse.ui.views
+```xml
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            class="com.rcp.plugin.perspective.view.MasterViewPart"
+            id="com.rcp.plugin.perspective.view.MasterViewPart"
+            name="Master ViewPart"
+            restorable="true">
+         <description>
+            This is the description for Master ViewPart
+         </description>
+      </view>
+      <view
+            allowMultiple="true"
+            class="com.rcp.plugin.perspective.view.SlaveViewPart"
+            id="com.rcp.plugin.perspective.view.SlaveViewPart"
+            name="Slave ViewPart"
+            restorable="true">
+      </view>
+   </extension>
+```
+每一个 ViewPart 需要继承 org.eclipse.ui.part.ViewPart, 然后在扩展的 class 属性里指定该实现了 ViewPart 的类，同时，也要给该 ViewPart 指定 unique id，该id 可以被用来直接打开该 ViewPart.
+
+ViewPart 最重要的方法是 createPartControl, 用来创建该 part 的具体内容. 需要注意的是， ViewPart 如果有自己独有的 toolbar item 或者 menu item, 需要在该方法中添加。EditorPart 有自己专门的 EditorActionBarContribution 来添加。
+```java
+  @Override
+  public void createPartControl(Composite parent) {
+    parent.setLayout(new GridLayout(1, false));
+    // init the ui
+    DemoComposite1 demoComposite1 = new DemoComposite1(parent, SWT.NONE, dirtyable);
+    demoComposite1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+    FamilyTreeViewerComposite familyTreeViewerComposite = new FamilyTreeViewerComposite(parent, SWT.NONE);
+    familyTreeViewerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    // ViewPart does not support action bar contributor of extension point, need to custom define action bar through code
+    // init menu
+    IMenuManager mm = getViewSite().getActionBars().getMenuManager();
+    WarningAction wa = new WarningAction();
+    wa.setText("Warning");
+    mm.add(wa);
+    mm.update(true);
+
+    // init toolbar
+    IToolBarManager tm = getViewSite().getActionBars().getToolBarManager();
+    tm.add(wa);
+    tm.update(true);
+  }
+```
+### EditorPart 扩展
+EditorPart 和 ViewPart 扩展点是不一样的，它有一些自己独有的配置。
+```xml
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.rcp.plugin.perspective.editor.FamilyInfoEditorPart"
+            contributorClass="com.rcp.plugin.perspective.editor.contribution.FamilyEditPartActionBarContributor"
+            default="false"
+            id="com.rcp.plugin.perspective.editor.FamilyInfoEditorPart"
+            name="Family Information Editor Part">
+      </editor>
+      <editor
+            class="com.rcp.plugin.perspective.editor.PeopleInfoEditorPart"
+            default="false"
+            id="com.rcp.plugin.perspective.editor.PeopleInfoEditorPart"
+            name="People Information Editor Part">
+      </editor>
+   </extension>
+```
+同样的，EditorPart 需要指定自己的实现类和 unique id 以及自己的 contributionClass. 这个 contributionClass 需要继承 EditorActionBarContributor, 在这个类里，实现对顶级菜单的更新。
+```java
+public class FamilyEditPartActionBarContributor extends EditorActionBarContributor {
+
+  @Override
+  public void contributeToMenu(IMenuManager menuManager) {
+    // will add to main workbench menu
+    super.contributeToMenu(menuManager);
+    MenuManager mm = new MenuManager("Family Editor");
+    menuManager.add(mm);
+
+    WarningAction action = new WarningAction();
+    action.setText("Family menu warning");
+    mm.add(action);
+  }
+
+  @Override
+  public void contributeToToolBar(IToolBarManager toolBarManager) {
+    // will add to main toolbar, and only be visible when select family editor part
+    super.contributeToToolBar(toolBarManager);
+    WarningAction action = new WarningAction();
+    action.setText("Family coolbar warning");
+    toolBarManager.add(action);
+  }
+
+}
+```
+当打开该编辑器时，对应的菜单就会出现，只有当关掉所有该类型的编辑器，对应的菜单才会隐藏。
+
+EditorPart 有两个重要的方法，init 和 createPartControl. init 在 createPartControl 之前执行
+```java
+public class FamilyInfoEditorPart extends BaseEditorPart {
+
+  public static final String ELEMENT_EDITOR_PART_ID = "com.asml.rcp.plugin.perspective.editor.FamilyInfoEditorPart";
+
+  private FamilyEditorInput familyEditorInput;
+
+  private FamilyInfoEditComposite familyEditComposite;
+
+  @Override
+  public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+    setSite(site);
+    setInput(input);
+    this.familyEditorInput = (FamilyEditorInput) input;
+  }
+  
+  @Override
+  public void createPartControl(Composite parent) {
+    parent.setLayout(new FillLayout());
+    familyEditComposite = new FamilyInfoEditComposite(parent, SWT.NONE);
+    familyEditComposite.setInput(familyEditorInput.getFamilyInformation());
+
+    // have to call this in editor to apply the update
+    setPartName(familyEditorInput.getName());
+    setTitleImage(familyEditorInput.getImageDescriptor().createImage());
+
+    // for EditorPart, user can define action bar through EditorActionBarContributor of extension point
+    // still could custom define action bar through code
+    // getEditorSite().getActionBars().getToolBarManager().add(new WarningAction());
+
+  }
+
+}
+```
+对于每一个 EditorPart, 它总是和一个文件或者一个对象绑定在一起。该对象需要实现 org.eclipse.ui.IEditorInput 接口，当尝试打开同一种类型的多个对象时，EditorPart 会通过 equals 方法判断两个input 是否为同一个，如果是，则不会用两个 EditorPart 打开相同的 input 对象。
+
+打开 EditorPart 的方法，
+```java
+  public static void openEditor(IEditorInput input, String editorId) {
+    try {
+      PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, editorId);
+    } catch (PartInitException exception) {
+      exception.printStackTrace();
+    }
+  }
+```
+
+### Perspective 扩展
+透视图是一组视图和编辑器的 layout 控制。同样的，每一个透视图需要指定自己的实现类和 unique id.
+```xml
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.asml.rcp.plugin.perspective.DemoPerspective"
+            fixed="false"
+            id="com.asml.rcp.plugin.perspective.DemoPerspective"
+            name="Demo Perspective">
+      </perspective>
+   </extension>
+```
+其中， DemoPerspective 需要实现 org.eclipse.ui.IPerspectiveFactory, 一般来讲，都是通过编辑区的相对位置来放置其它视图。
+```java
+public class DemoPerspective implements IPerspectiveFactory {
+  
+  @Override
+  public void createInitialLayout(IPageLayout layout) {
+    layout.addView(MasterViewPart.MASTER_VIEW_ID, IPageLayout.LEFT, 0.46f, IPageLayout.ID_EDITOR_AREA);
+    layout.addView(SlaveViewPart.SLAVE_VIEW_ID, IPageLayout.BOTTOM, 0.5f, IPageLayout.ID_EDITOR_AREA);
+    layout.addView(MasterViewPart.MASTER_VIEW_ID + ":1", IPageLayout.RIGHT, 0.2f, IPageLayout.ID_EDITOR_AREA);
+  }
+}
+```
+需要注意的是，如果某一种视图在相同或者不同的透视图中被引用，并且想让该视图是各自独立的，那么需要在 view part id 后面加上 second id, such as MasterViewPart.MASTER_VIEW_ID:1, 否则具有相同 id 的视图会是共享的。
+
+打开 Perspective 的方法，
+```java
+  public static void openPerspective(String perspectiveId) {
+    try {
+      PlatformUI.getWorkbench().showPerspective(perspectiveId, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+    } catch (WorkbenchException exception) {
+      exception.printStackTrace();
+    }
+  }
+```
+在打开应用程序的时候，一般需要指定一个默认的透视图，这是在 ApplicationWorkbenchAdvisor 里完成的
+```java
+public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
+
+    public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
+        return new ApplicationWorkbenchWindowAdvisor(configurer);
+    }
+    
+    public void initialize(IWorkbenchConfigurer configurer) {
+        super.initialize(configurer);
+        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_INTRO, true);
+        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, true);
+    }
+
+    public String getInitialWindowPerspectiveId() {
+	return "com.rcp.plugin.perspective.DemoPerspective";
+    }
+}
+```
+
 
