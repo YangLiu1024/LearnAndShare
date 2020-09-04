@@ -1,4 +1,4 @@
-# Introduction to Eclipse RCP - OSGi
+# Introduction to Eclipse RCP
 
 OSGi 是基于 Java 的服务平台规范, OSGi 的本质是将 Java 面向对象的开发转向面向组件和服务的开发。 OSGi 框架提供了一套完善的机制用于管理和控制组件和服务的生命周期, 以及组件和服务在其生命周期内的交互. 
 
@@ -478,5 +478,22 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     }
 }
 ```
+### Bindings 扩展
+很多时候，我们需要为常用的 command 添加快捷键，比如 open, save 之类的，这时就需要 bindings 扩展。
+```xml
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.ui.help.helpContents"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+H">
+      </key>
+   </extension>
+```
+这里，为eclipse 内置的 org.eclipse.ui.help.helpContents 添加快捷键 'CTRL + H', contextId 表示能够激活当前快捷键操作的使用范围， schemeId 表示使用哪种键盘绑定方式，这里都使用默认配置。
+
+## RCP Extension Points
+我们不仅可以使用其它插件提供的扩展点，还可以创建自己的扩展点供其它插件使用。
 
 
