@@ -509,9 +509,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 <details>
 	<summary>Extension Points Definition Sample</summary>
 	
-	```xml
-	<?xml version='1.0' encoding='UTF-8'?>
-<!-- Schema file written by PDE -->
+	<!-- ?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="com.asml.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
@@ -658,9 +656,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
       </documentation>
    </annotation>
 
-
-</schema>
-	```
+</schema -->
 </details>
 
 
