@@ -494,6 +494,11 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 这里，为eclipse 内置的 org.eclipse.ui.help.helpContents 添加快捷键 'CTRL + H', contextId 表示能够激活当前快捷键操作的使用范围， schemeId 表示使用哪种键盘绑定方式，这里都使用默认配置。
 
 ## RCP Extension Points
-我们不仅可以使用其它插件提供的扩展点，还可以创建自己的扩展点供其它插件使用。
+我们不仅可以使用其它插件提供的扩展点，还可以创建自己的扩展点供其它插件使用。当一个插件允许其它插件扩展其功能时，可以在当前插件声明扩展点。扩展点是一种约定，该约定通常由 XML 标记和 Java 接口构成。当第三方开发者需要扩展当前插件的功能时，不需要了解当前插件的内部实现方式，只需要按照扩展点申明的约束进行一些简单的配置即可实现功能上的扩展。有一些扩展完全是声明性的，不需要写代码，比如快捷键绑定。
 
+当新建扩展点时，需要提供扩展点的 unique id, name, schema. schema 是可选的，用来描述该怎么使用当前扩展点。双击该 schema 文件，会打开扩展点编辑器。
+### 扩展点编辑器
+ - `Overview` 页面列举了扩展点的基本信息，比如所属插件 id, 当前扩展点 id, 扩展点 name, 以及 description， examples 等等
+ - `Definition` 页面用来维护扩展点元素的操作界面。扩展点使用 XML Schema 的元素和属性来定义。元素分为 extension 元素和其它自定义元素， extension 元素是特殊的根元素，用于定义扩展的入口点。自定义元素是用户自定义的元素，是 extension 元素的组成部分。每个元素可以有多个属性，属性有5种 type: string/boolean/class/identifier/resource, 使用方式可以是 optional/required/default。extension 元素和自定义元素可以包含自定义元素，但不能含有自引用循环。一个元素通过 Choice 或者 Sequence 声明来引用其它元素， 其中， Choice 声明仅允许包含在 Choice 声明中的元素之一出现在包含元素中。Sequence 声明要求包含的元素以指定的顺序出现在包含元素中，每个元素可以出现任意次。min occurrences 表示选中元素的最少次数，可以为0，表示该 Choice 声明包含的元素是可选的。max occurrences 表示最大次数，也可以不设限。
+ - `Source` 页面同步展示了 `Definition` 页面的 xml 版本
 
