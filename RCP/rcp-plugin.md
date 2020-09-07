@@ -504,113 +504,91 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
  
  Notes:
   - 每个元素最多有一个 Choice 或者 Sequence 声明
-  - Choice/Sequence 的 occurrences 和所含元素的 occurences 是独立的
-
+  - Choice/Sequence 的 occurrences setting 和所含元素的 occurences 是独立的
+### 扩展点读取
 <details>
-	<summary>Extension Points Definition Sample</summary>
+	<summary>Load Extension Points</summary>
 	
-<schema targetNamespace="com.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
-   <element name="extension">
-      <annotation>
-         <appinfo>
-            <meta.element />
-         </appinfo>
-      </annotation>
-      <complexType>
-         <choice>
-            <element ref="elementA"/>
-            <element ref="elementB"/>
-         </choice>
-         <attribute name="point" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute translatable="true"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+```java
+public class ExtensionUtil {
+  private static final IExtensionRegistry registry = Platform.getExtensionRegistry();
 
-   <element name="elementA">
-      <complexType>
-         <choice>
-            <element ref="elementC" minOccurs="1" maxOccurs="2"/>
-            <element ref="elementD"/>
-         </choice>
-         <attribute name="StringAttribute" type="string" use="default" value="default value">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+  /**
+   * Hide the constructor for all static function usage.
+   */
+  private ExtensionUtil() {
+    throw new UnsupportedOperationException("DONOT instantiate " + ExtensionUtil.class.getName());
+  }
 
-   <element name="elementB">
-      <complexType>
-         <sequence>
-            <element ref="elementC" minOccurs="1" maxOccurs="2"/>
-            <element ref="elementD"/>
-         </sequence>
-         <attribute name="BooleanAttribute" type="boolean">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+  /**
+   * Get extension point.
+   *
+   * @param extPointId
+   *          the id of extension point.
+   * @return the instance of extension point.
+   */
+  public static IExtensionPoint getExtensionPoint(String extPointId) {
+    return registry.getExtensionPoint(extPointId);
+  }
 
-   <element name="elementC">
-      <complexType>
-         <attribute name="ClassAttribute" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+  /**
+   * Get the extensions by given extension point id.
+   *
+   * @param extPointId
+   *          the extension point id.
+   * @return the array of extensions.
+   */
+  public static IExtension[] getExtensions(String extPointId) {
+    return getExtensions(getExtensionPoint(extPointId));
+  }
 
-   <element name="elementD">
-      <complexType>
-         <attribute name="resourceAttribute" type="string">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="resource"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
+  /**
+   * Get the extensions by given extension point.
+   *
+   * @param extPoint
+   *          the extension point.
+   * @return the array of extensions.
+   */
+  public static IExtension[] getExtensions(IExtensionPoint extPoint) {
+    if (extPoint != null) {
+      IExtension[] extensions = extPoint.getExtensions();
+      if (extensions != null) {
+        return extensions;
+      }
+    }
+    return new IExtension[] {};
+  }
 
-</schema>
+  /**
+   * Get executable interface from given extension.
+   *
+   * @param ext
+   *          the extension.
+   * @param elementName
+   *          the name of element.
+   * @param attrName
+   *          the name of attribute.
+   * @return the executable interface, which could be null.
+   */
+  public static Object getExecutable(IExtension ext, String elementName, String attrName) {
+    Object result = null;
+
+    if (ext != null) {
+      try {
+        for (IConfigurationElement element : ext.getConfigurationElements()) {
+          if (element.getName().equals(elementName)) {
+            result = element.createExecutableExtension(attrName);
+          }
+        }
+      } catch (InvalidRegistryObjectException | CoreException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return result;
+  }
+}
+```
 </details>
 
 
