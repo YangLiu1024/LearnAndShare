@@ -509,17 +509,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 <details>
 	<summary>Extension Points Definition Sample</summary>
 	
-	<!-- ?xml version='1.0' encoding='UTF-8'?>
-<schema targetNamespace="com.asml.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
-<annotation>
-      <appinfo>
-         <meta.schema plugin="com.asml.rcp.plugin.app" id="com.asml.rcp.plugin.app.extension.point" name="ExtensionPoint"/>
-      </appinfo>
-      <documentation>
-         [Enter description of this extension point.]
-      </documentation>
-   </annotation>
-
+<schema targetNamespace="com.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
    <element name="extension">
       <annotation>
          <appinfo>
@@ -620,43 +610,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
       </complexType>
    </element>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="since"/>
-      </appinfo>
-      <documentation>
-         [Enter the first release in which this extension point appears.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
-         <meta.section type="examples"/>
-      </appinfo>
-      <documentation>
-         [Enter extension point usage example here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
-         <meta.section type="apiinfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
-
-</schema -->
+</schema>
 </details>
 
 
