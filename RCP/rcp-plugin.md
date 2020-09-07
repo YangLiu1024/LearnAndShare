@@ -502,6 +502,50 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
  - `Definition` 页面用来维护扩展点元素的操作界面。扩展点使用 XML Schema 的元素和属性来定义。元素分为 extension 元素和其它自定义元素， extension 元素是特殊的根元素，用于定义扩展的入口点。自定义元素是用户自定义的元素，是 extension 元素的组成部分。每个元素可以有多个属性，属性有5种 type: string/boolean/class/identifier/resource, 使用方式可以是 optional/required/default。extension 元素和自定义元素可以包含自定义元素，但不能含有自引用循环。一个元素通过 Choice 或者 Sequence 声明来引用其它元素， 其中， Choice 声明仅允许包含在 Choice 声明中的元素之一出现在包含元素中。Sequence 声明要求包含的元素以指定的顺序出现在包含元素中，每个元素可以出现任意次。min occurrences 表示选中元素的最少次数，可以为0，表示该 Choice 声明包含的元素是可选的。max occurrences 表示最大次数，也可以不设限。
  - `Source` 页面同步展示了 `Definition` 页面的 xml 版本
  
+ ```xml
+<schema targetNamespace="com.asml.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.rcp.plugin.app" id="com.rcp.plugin.app.extension" name="Extension"/>
+      </appinfo>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="elementA" minOccurs="1" maxOccurs="2"/>
+            <element ref="elementB"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+         </attribute>
+         <attribute name="id" type="string">
+         </attribute>
+         <attribute name="name" type="string">
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementA">
+      <complexType>
+         <attribute name="text" type="string">
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementB">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.rcp.plugin.app.extension.ExtensionSayHello"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+</schema>
+```
  Notes:
   - 每个元素最多有一个 Choice 或者 Sequence 声明
   - Choice/Sequence 的 occurrences setting 和所含元素的 occurences 是独立的
@@ -558,37 +602,45 @@ public class ExtensionUtil {
     }
     return new IExtension[] {};
   }
-
-  /**
-   * Get executable interface from given extension.
-   *
-   * @param ext
-   *          the extension.
-   * @param elementName
-   *          the name of element.
-   * @param attrName
-   *          the name of attribute.
-   * @return the executable interface, which could be null.
-   */
-  public static Object getExecutable(IExtension ext, String elementName, String attrName) {
-    Object result = null;
-
-    if (ext != null) {
-      try {
-        for (IConfigurationElement element : ext.getConfigurationElements()) {
-          if (element.getName().equals(elementName)) {
-            result = element.createExecutableExtension(attrName);
-          }
-        }
-      } catch (InvalidRegistryObjectException | CoreException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return result;
-  }
 }
 ```
 </details>
+其中， IExtension 代表着一个扩展点实现，可能有多个插件扩展了同一个扩展点，所以返回数组来表示。每一个IExtension 可以有多个 IConfigurationElement,每个 IConfigurationElement 可以通过 getAttribute(String attributeName) 来获取属性值，通过 createExecutableExtension(String attributeName) 来构建对应的 Java class, 通过 getChildren() 来获取自己包含的子元素列表。
+
+一般通过元素名来查找对应的 IConfigurationElement，找到元素后，再通过属性名来查找对应的属性。
+```java
+public class ExtensionPointLoader {
+  public static List<ExtensionPointInput> loadExtensionPointInput() {
+    List<ExtensionPointInput> inputs = new ArrayList<>();
+    IExtension[] extensions = ExtensionUtil
+        .getExtensions(ExtensionUtil.getExtensionPoint("com.asml.rcp.plugin.app.extension"));
+    for (IExtension ext : extensions) {
+      ExtensionPointInput input = new ExtensionPointInput();
+      IConfigurationElement[] elements = ext.getConfigurationElements();
+      for (IConfigurationElement ele : elements) {
+        if (ele.getName().equals("elementA")) {
+          input.addElementA(ele.getAttribute("text"));
+        } else if (ele.getName().equals("elementB")) {
+          try {
+            Object sayHello = ele.createExecutableExtension("class");
+            if (sayHello instanceof ExtensionSayHello) {
+              input.setSayHello((ExtensionSayHello) sayHello);
+            }
+          } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+        }
+      }
+      inputs.add(input);
+    }
+    return inputs;
+  }
+
+}
+```
+
+### 扩展点使用
+当定义好扩展点之后，就可以在其它的插件中使用了。在扩展编辑器里，Eclipse 会根据扩展点的 schema 设置来约束用户在扩展编辑器里的操作。
 
 
