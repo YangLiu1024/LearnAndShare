@@ -501,4 +501,166 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
  - `Overview` 页面列举了扩展点的基本信息，比如所属插件 id, 当前扩展点 id, 扩展点 name, 以及 description， examples 等等
  - `Definition` 页面用来维护扩展点元素的操作界面。扩展点使用 XML Schema 的元素和属性来定义。元素分为 extension 元素和其它自定义元素， extension 元素是特殊的根元素，用于定义扩展的入口点。自定义元素是用户自定义的元素，是 extension 元素的组成部分。每个元素可以有多个属性，属性有5种 type: string/boolean/class/identifier/resource, 使用方式可以是 optional/required/default。extension 元素和自定义元素可以包含自定义元素，但不能含有自引用循环。一个元素通过 Choice 或者 Sequence 声明来引用其它元素， 其中， Choice 声明仅允许包含在 Choice 声明中的元素之一出现在包含元素中。Sequence 声明要求包含的元素以指定的顺序出现在包含元素中，每个元素可以出现任意次。min occurrences 表示选中元素的最少次数，可以为0，表示该 Choice 声明包含的元素是可选的。max occurrences 表示最大次数，也可以不设限。
  - `Source` 页面同步展示了 `Definition` 页面的 xml 版本
+ 
+ Notes:
+  - 每个元素最多有一个 Choice 或者 Sequence 声明
+  - Choice/Sequence 的 occurrences 和所含元素的 occurences 是独立的
+
+<details>
+	<summary>Extension Points Definition Sample</summary>
+	
+	```xml
+	<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.asml.rcp.plugin.app" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.asml.rcp.plugin.app" id="com.asml.rcp.plugin.app.extension.point" name="ExtensionPoint"/>
+      </appinfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <choice>
+            <element ref="elementA"/>
+            <element ref="elementB"/>
+         </choice>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementA">
+      <complexType>
+         <choice>
+            <element ref="elementC" minOccurs="1" maxOccurs="2"/>
+            <element ref="elementD"/>
+         </choice>
+         <attribute name="StringAttribute" type="string" use="default" value="default value">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementB">
+      <complexType>
+         <sequence>
+            <element ref="elementC" minOccurs="1" maxOccurs="2"/>
+            <element ref="elementD"/>
+         </sequence>
+         <attribute name="BooleanAttribute" type="boolean">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementC">
+      <complexType>
+         <attribute name="ClassAttribute" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="elementD">
+      <complexType>
+         <attribute name="resourceAttribute" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>
+	```
+</details>
+
 
