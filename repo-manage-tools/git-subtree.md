@@ -588,6 +588,52 @@ Date:   Fri Aug 28 16:43:37 2020 +0800
 ```
 ![](images/host-pull-from-leaf-squash.png)
 
+### Git log
+for Host repo
+```git
+yangliu@LT424684 MINGW64 /HostRepo (master)
+$ git log --oneline --graph
+*   5ff1bde (HEAD -> master, origin/master, origin/HEAD) merge leaf by through suqash and fix conflict
+|\
+| * 81d1437 Squashed 'leaf/' changes from 87bccee..e86df33
+* |   1b23fc8 merge leaf repo and fix conflict
+|\ \
+| * | aad22a4 modify from leaf 2
+| * | 56d4401 modify from leaf 1
+| * | 5a5546c modify leaf/readme from host
+| * | 822d1bf modify leaf/readme and readme from host
+| |/
+* | 3681da0 modify README.md from host
+* | 6bf0800 modify leaf/readme from host
+* | d08b35d modify leaf/readme and readme from host
+* |   5322d43 Add 'leaf/' from commit '87bccee8b4c9c33e811e32c25b7df0378dbdd03c'
+|\ \
+| |/
+| * 87bccee leaf commit 2
+| * f95ec87 leaf commit 1
+| * 281c258 Initial commit
+* f9dbd6e host commit 4
+* 87e659a host commit 3
+* 2e3bfaa host commit 2
+* 6eb9bba Commit 1
+
+```
+
+for leaf repo
+```git
+yangliu@LT424684 MINGW64 /LeafRepo (master)
+$ git log --graph --oneline
+* e86df33 (HEAD -> master, origin/master, origin/HEAD) test squash commit 2
+* 6b39c38 test squash commit 1
+* aad22a4 modify from leaf 2
+* 56d4401 modify from leaf 1
+* 5a5546c modify leaf/readme from host
+* 822d1bf modify leaf/readme and readme from host
+* 87bccee leaf commit 2
+* f95ec87 leaf commit 1
+* 281c258 Initial commit
+```
+
 ## Benifit of subtree
 The sub repository managed by subtree is transparent to user, its just a normal folder to user.
 Just need to sync sub repository at suitable time.
