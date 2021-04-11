@@ -73,14 +73,14 @@ unwatch()//解除监听
 * <code>vm.$watch(expOrFn, callback, [options]): Function<code>. options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
 * <code>vm.$set(target, propertyName/index, value)</code>, target 是一个对象或者数组，vm.$set 是全局函数 Vue.set 的别名。 用处是给 响应式对象添加响应式属性
 * <code>vm.$delete(target, propertyName/index)</code>, vm.$delete 是 Vue.delete 的别名。如果对象是响应式的，则保证删除能够触发视图更新
-
 * <code>vm.$on(event, callback)</code>, 监听当前实例上的自定义事件，事件可以由 vm.$emit 触发
 * <code>vm.$once(event, callback)</code>, 监听当前实例上的自定义事件，但只监听一次，触发后，移除该监听器
 * <code>vm.$off(event, callback)</code>, 移除自定义事件监听器。如果不提供参数，则移除该实例所有自定义事件的所有监听器，如果只指定事件，则删除该事件的所有监听器。
 * <code>vm.$emit(event, [..args])</code>, 触发当前实例上的事件，参数可以是多个，并且都会被回调函数捕获
-
 * <code>vm.$mount()</code>, 用于挂载 DOM 元素
 * <code>vm.$forceUpdate</code>, 用于迫使 vue 实例重新渲染，注意该方法仅影响该实例本身，以及插入插槽内容的子组件
 * <code>vm.$nextTick(callback)</code>, 将回调延迟到 DOM 下次渲染更新完成之后。比如在代码里更改某数据后，调用该方法，使得在 DOM 更新之后再执行回调
 * <code>vm.$destroy</code>, 销毁实例
+
+
 ### Vue 内置指令
