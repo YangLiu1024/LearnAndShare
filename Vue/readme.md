@@ -62,8 +62,8 @@ new Vue({
 ### Vue 实例方法
 <code>vm.$watch(expOrFn, callback, [options]): Function<code>
  
- options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。
- 该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
+options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。
+该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
 ```js
 //a.b.c 是一个键路径, 当 c 内部的某些属性值改变时，也会触发回调
 vm.$watch('a.b.c', function(newV, oldV) {
