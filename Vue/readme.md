@@ -70,7 +70,8 @@ var unwatch = vm.$watch(function() {return this.a + this.b}, function(newV, oldV
 
 unwatch()//解除监听
 ```
-* <code>vm.$watch(expOrFn, callback, [options]): Function<code>. options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
+* <code>vm.$watch(expOrFn, callback, [options]): Function<code>. options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。
+deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
 * <code>vm.$set(target, propertyName/index, value)</code>, target 是一个对象或者数组，vm.$set 是全局函数 Vue.set 的别名。 用处是给 响应式对象添加响应式属性
 * <code>vm.$delete(target, propertyName/index)</code>, vm.$delete 是 Vue.delete 的别名。如果对象是响应式的，则保证删除能够触发视图更新
 * <code>vm.$on(event, callback)</code>, 监听当前实例上的自定义事件，事件可以由 vm.$emit 触发
@@ -81,6 +82,14 @@ unwatch()//解除监听
 * <code>vm.$forceUpdate</code>, 用于迫使 vue 实例重新渲染，注意该方法仅影响该实例本身，以及插入插槽内容的子组件
 * <code>vm.$nextTick(callback)</code>, 将回调延迟到 DOM 下次渲染更新完成之后。比如在代码里更改某数据后，调用该方法，使得在 DOM 更新之后再执行回调
 * <code>vm.$destroy</code>, 销毁实例
-
-
 ### Vue 内置指令
+ * v-text 用来更新 element 的 textContent. <span v-text="msg"></span> 等价于 <span>{{msg}}</span>
+ * v-html, 更新元素的 innerHTML
+ * v-show,绑定 boolean 表达式，控制元素 是否display:none
+ * v-if, 绑定 boolean 表达式，控制组件是否销毁或者重建。 当 v-if 与 v-for 在同一个元素上使用，v-for 优先级更高。这意味着 v-if 会依次作用于所有 item
+ * v-else, 前兄弟节点需为 v-if 或者 v-else-if，不需要表达式
+ * v-else-if, 前兄弟节点需为 v-if 或者 v-else-if
+ * v-for, 遍历数组/对象/string/integer/iterable， v-for = "(item, index) in items" 或者 v-for="(val, key, index) in object"
+ * v-on, 绑定事件监听器。事件修饰符： .stop/.prevent/.self/.native/.keyCode/.once. 当监听原生事件时，响应方法以事件为唯一参数，比如 <button @click="onClick"></button>, onClick 方法可以接收一个事件参数。 当使用内联语句时，可以直接访问该事件属性。 <button @click="onClick(1, $event)"></button>. v-on 还可以使用对象语法， <button v-on="{click: doThis, mouseup: doThat}"></button>。使用对象语法，意味着事件监听器可以进行运算，传递等等操作。 v-on 还可以监听动态事件， <button v-on:[event]="doThis"></button>
+ * v-bind, 绑定属性或者子组件 prop. 还可以将父组件接收的 props 传递给子组件 <child-component v-bind="$props"></child-component>
+ * v-model, 在表达控件上创建双向绑定。一般来说，控件在改变 value 时，会触发 input 事件，并将新的值发出，父组件响应该事件，并更新自己的值，达到双向更新
