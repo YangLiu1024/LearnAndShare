@@ -92,4 +92,8 @@ deep 表示是否监听对象内部值的变化，immediate 表示当值变化�
  * v-for, 遍历数组/对象/string/integer/iterable， v-for = "(item, index) in items" 或者 v-for="(val, key, index) in object"
  * v-on, 绑定事件监听器。事件修饰符： .stop/.prevent/.self/.native/.keyCode/.once. 当监听原生事件时，响应方法以事件为唯一参数，比如 <button @click="onClick"></button>, onClick 方法可以接收一个事件参数。 当使用内联语句时，可以直接访问该事件属性。 <button @click="onClick(1, $event)"></button>. v-on 还可以使用对象语法， <button v-on="{click: doThis, mouseup: doThat}"></button>。使用对象语法，意味着事件监听器可以进行运算，传递等等操作。 v-on 还可以监听动态事件， <button v-on:[event]="doThis"></button>
  * v-bind, 绑定属性或者子组件 prop. 还可以将父组件接收的 props 传递给子组件 <child-component v-bind="$props"></child-component>
- * v-model, 在表达控件上创建双向绑定。一般来说，控件在改变 value 时，会触发 input 事件，并将新的值发出，父组件响应该事件，并更新自己的值，达到双向更新
+ * v-model, 在表达控件上创建双向绑定。一般来说，控件在改变 value 时，会触发 input 事件，并将新的值发出，父组件响应该事件，并更新自己的值，达到双向更新.
+ * v-slot
+ * v-pre
+ * v-cloak
+ * v-one
