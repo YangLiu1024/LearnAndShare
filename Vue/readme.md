@@ -82,6 +82,8 @@ deep 表示是否监听对象内部值的变化，immediate 表示当值变化�
 * <code>vm.$forceUpdate</code>, 用于迫使 vue 实例重新渲染，注意该方法仅影响该实例本身，以及插入插槽内容的子组件
 * <code>vm.$nextTick(callback)</code>, 将回调延迟到 DOM 下次渲染更新完成之后。比如在代码里更改某数据后，调用该方法，使得在 DOM 更新之后再执行回调
 * <code>vm.$destroy</code>, 销毁实例
+
+
 ### Vue 内置指令
  * v-text 用来更新 element 的 textContent. <span v-text="msg"></span> 等价于 <span>{{msg}}</span>
  * v-html, 更新元素的 innerHTML
@@ -90,10 +92,9 @@ deep 表示是否监听对象内部值的变化，immediate 表示当值变化�
  * v-else, 前兄弟节点需为 v-if 或者 v-else-if，不需要表达式
  * v-else-if, 前兄弟节点需为 v-if 或者 v-else-if
  * v-for, 遍历数组/对象/string/integer/iterable， v-for = "(item, index) in items" 或者 v-for="(val, key, index) in object"
- * v-on, 绑定事件监听器。事件修饰符： .stop/.prevent/.self/.native/.keyCode/.once. 当监听原生事件时，响应方法以事件为唯一参数，比如 <button @click="onClick"></button>, onClick 方法可以接收一个事件参数。 当使用内联语句时，可以直接访问该事件属性。 <button @click="onClick(1, $event)"></button>. v-on 还可以使用对象语法， <button v-on="{click: doThis, mouseup: doThat}"></button>。使用对象语法，意味着事件监听器可以进行运算，传递等等操作。 v-on 还可以监听动态事件， <button v-on:[event]="doThis"></button>
- * v-bind, 绑定属性或者子组件 prop. 还可以将父组件接收的 props 传递给子组件 <child-component v-bind="$props"></child-component>
- * v-model, 在表达控件上创建双向绑定。一般来说，控件在改变 value 时，会触发 input 事件，并将新的值发出，父组件响应该事件，并更新自己的值，达到双向更新.
- * v-slot
- * v-pre
- * v-cloak
- * v-one
+ * v-on, 绑定事件监听器, 缩写为 @。事件修饰符： .stop/.prevent/.self/.native/.keyCode/.once. 当监听原生事件时，响应方法以事件为唯一参数，比如 <button @click="onClick"></button>, onClick 方法可以接收一个事件参数。 当使用内联语句时，可以直接访问该事件属性。 <button @click="onClick(1, $event)"></button>. v-on 还可以使用对象语法， <button v-on="{click: doThis, mouseup: doThat}"></button>。使用对象语法，意味着事件监听器可以进行运算，传递等等操作。 v-on 还可以监听动态事件， <button v-on:[event]="doThis"></button>
+ * v-bind, 绑定属性或者子组件 prop，缩写为 :. 还可以将父组件接收的 props 传递给子组件 <child-component v-bind="$props"></child-component>
+ * v-model, 在表单控件上创建双向绑定。一般来说，控件在改变 value 时，会触发 input 事件，并将新的值发出，父组件响应该事件，并更新自己的值，达到双向更新.
+ * v-slot, 指定具名插槽，默认值是 default, 比如 v-slot:header, 或需要接收 prop 的插槽，v-slot 只能用于 template 元素， 缩写为 #. 有的时候，在外部自定义 slot 的内容，需要使用到组件本身的数据，为了打破作用域访问限制，这个时候就可以通过作用域插槽将组件参数传递出去，供外部调用。怎么传递呢？通过 v-bind 将数据作为属性绑定给 slot，eg, <p><slot v-bind:user="user"></slot></p>, 这样就把组件的数据 user 作为 user 属性，绑定在了 default slot 上。在父级作用域，通过 <user><template v-slot:default="slotProps"></template></user> 来接收 user 组件 default slot 的 props, slotProps 是一个对象，名字任意，是绑定在 default slot 上所有属性的集合。在我们的例子里，就可以通过 slotProps.user 来访问 user 组件提供的 user 数据。作用域插槽的最大用处就在于可以在父作用域通过子组件的数据自定义子组件内容。
+ * v-pre， 用来跳过指定元素及其子元素的编译过程 
+ * v-one， 元素只渲染一次
