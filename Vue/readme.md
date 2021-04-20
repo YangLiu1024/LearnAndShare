@@ -65,18 +65,17 @@ new Vue({
 * vm.$listeners: [key:string]:Function|Array<Function> 包含了父作用域中的不含 .native 修饰的 v-on 事件监听器
 
 ### Vue 实例方法
-* <code>vm.$watch(expOrFn, callback, [options]): Function<code>. expOrFn 为表达式时，会监测该表达式的值，为 function时，会监测该函数的返回值，类似于监听计算属性。options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可。
-* <code>vm.$set(target, propertyName/index, value)</code>, target 是一个对象或者数组，vm.$set 是全局函数 Vue.set 的别名。 用处是给 响应式对象添加响应式属性
-* <code>vm.$delete(target, propertyName/index)</code>, vm.$delete 是 Vue.delete 的别名。如果对象是响应式的，则保证删除能够触发视图更新
-* <code>vm.$on(event, callback)</code>, 监听当前实例上的自定义事件，事件可以由 vm.$emit 触发
-* <code>vm.$once(event, callback)</code>, 监听当前实例上的自定义事件，但只监听一次，触发后，移除该监听器
-* <code>vm.$off(event, callback)</code>, 移除自定义事件监听器。如果不提供参数，则移除该实例所有自定义事件的所有监听器，如果只指定事件，则删除该事件的所有监听器。
-* <code>vm.$emit(event, [..args])</code>, 触发当前实例上的事件，参数可以是多个，并且都会被回调函数捕获
-* <code>vm.$mount()</code>, 用于挂载 DOM 元素
-* <code>vm.$forceUpdate</code>, 用于迫使 vue 实例重新渲染，注意该方法仅影响该实例本身，以及插入插槽内容的子组件
-* <code>vm.$nextTick(callback)</code>, 将回调延迟到 DOM 下次渲染更新完成之后。比如在代码里更改某数据后，调用该方法，使得在 DOM 更新之后再执行回调
-* <code>vm.$destroy</code>, 销毁实例
-
+* vm.$watch(expOrFn, callback, [options]): Function. expOrFn 为表达式时，会监测该表达式的值，为 function时，会监测该函数的返回值，类似于监听计算属性。options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可。
+* vm.$set(target, propertyName/index, value), target 是一个对象或者数组，vm.$set 是全局函数 Vue.set 的别名。 用处是给 响应式对象添加响应式属性
+* vm.$delete(target, propertyName/index), vm.$delete 是 Vue.delete 的别名。如果对象是响应式的，则保证删除能够触发视图更新
+* vm.$on(event, callback), 监听当前实例上的自定义事件，事件可以由 vm.$emit 触发
+* vm.$once(event, callback), 监听当前实例上的自定义事件，但只监听一次，触发后，移除该监听器
+* vm.$off(event, callback), 移除自定义事件监听器。如果不提供参数，则移除该实例所有自定义事件的所有监听器，如果只指定事件，则删除该事件的所有监听器。
+* vm.$emit(event, [..args]), 触发当前实例上的事件，参数可以是多个，并且都会被回调函数捕获
+* vm.$mount(), 用于挂载 DOM 元素
+* vm.$forceUpdate, 用于迫使 vue 实例重新渲染，注意该方法仅影响该实例本身，以及插入插槽内容的子组件
+* vm.$nextTick(callback), 将回调延迟到 DOM 下次渲染更新完成之后。比如在代码里更改某数据后，调用该方法，使得在 DOM 更新之后再执行回调
+* vm.$destroy, 销毁实例
 
 ### Vue 内置指令
  * v-text 用来更新 element 的 textContent. <span v-text="msg"></span> 等价于 <span>{{msg}}</span>
@@ -94,16 +93,16 @@ new Vue({
  * v-one， 元素只渲染一次
 
 ### Vue 特殊属性
-* key
-* ref
-* is
-* slot
-* slot-scope
-* scope
+* key, number| string, 有相同父元素的子元素需要有unique key, 否则会造成渲染错误
+* ref, string, 用来给原生元素或子组件注册引用信息。引用信息将会注册在父组件的 vm.$refs 对象上，只有在渲染完成后才能访问
+* is, string | Object(组件对象), 用于动态组件, <component :is="currentView"></component>
+* slot(deprecated), string, 已废弃, 用于标记往哪个具名插槽插入子组件内容，被 v-slot:name 替代， name 是 slot 的名字
+* slot-scope(deprecated), 已废弃, 用于将元素或者组件表示为作用于插槽
+* scope(removed), 已移除，被 slot-scope 替代
 
 ### Vue 内置组件
-* component
-* transition
+* component, 有属性 is, 用于动态组件
+* transition, 有属性 name, 用于自动生成 css 过渡类名，比如 name: 'fade' 将自动拓展为 .fade-enter, .fade-enter-active 等。还有一些其它的属性和事件
 * transition-group
-* keep-alive
-* slot
+* keep-alive, props 有 include/exclude, 都是正则表达式，只有名称匹配的组件才会被缓存
+* slot, 属性有 name,用于给插槽命名。 slot元素自身会被父组件传递的内容替换。
