@@ -43,6 +43,11 @@ new Vue({
   directives:{},//定义该组件使用的自定义指令
   filters: {}, //定义该组件使用的过滤器
   mixins:[],//定义该组件使用的一系列混入对象
+  
+  provide: {},// Object | () => Object, 该对象包含可注入其子孙组件的 property
+  inject: [],//Array<string>| {[key:string]: string|Object}， 使用 Array<string> 时就是简单注入，使用 {key:Object} 时，可以对注入的属性进行配置
+  
+  model:{prop?:string, event?: string},//允许自定义组件在使用 v-model 时定制 prop 和 event. prop 指定想要绑定的属性名，event 是指定的属性值改变时，emit 的 事件名。 默认情况下，一个组件上的 v-model 会把 value 作为 prop, 且把 input 作为 event.
 })
 ```
 ### Vue 实例属性
@@ -60,18 +65,7 @@ new Vue({
 * vm.$listeners: [key:string]:Function|Array<Function> 包含了父作用域中的不含 .native 修饰的 v-on 事件监听器
 
 ### Vue 实例方法
-```js
-//a.b.c 是一个键路径, 当 c 内部的某些属性值改变时，也会触发回调
-vm.$watch('a.b.c', function(newV, oldV) {
- //do something
-}， {deep: true})
-//监听一个函数的返回值，这儿相当于监听一个匿名计算属性
-var unwatch = vm.$watch(function() {return this.a + this.b}, function(newV, oldV){//do something})
-
-unwatch()//解除监听
-```
-* <code>vm.$watch(expOrFn, callback, [options]): Function<code>. options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。
-deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可
+* <code>vm.$watch(expOrFn, callback, [options]): Function<code>. expOrFn 为表达式时，会监测该表达式的值，为 function时，会监测该函数的返回值，类似于监听计算属性。options 是一个对象，包含两个 boolean 类型的参数，deep 和 immediate。deep 表示是否监听对象内部值的变化，immediate 表示当值变化，立即以当前值触发回调。该方法返回一个函数 unwatch，当想解除监听时，调用该函数即可。
 * <code>vm.$set(target, propertyName/index, value)</code>, target 是一个对象或者数组，vm.$set 是全局函数 Vue.set 的别名。 用处是给 响应式对象添加响应式属性
 * <code>vm.$delete(target, propertyName/index)</code>, vm.$delete 是 Vue.delete 的别名。如果对象是响应式的，则保证删除能够触发视图更新
 * <code>vm.$on(event, callback)</code>, 监听当前实例上的自定义事件，事件可以由 vm.$emit 触发
@@ -98,3 +92,18 @@ deep 表示是否监听对象内部值的变化，immediate 表示当值变化�
  * v-slot, 指定具名插槽，默认值是 default, 比如 v-slot:header, 或需要接收 prop 的插槽，v-slot 只能用于 template 元素， 缩写为 #. 有的时候，在外部自定义 slot 的内容，需要使用到组件本身的数据，为了打破作用域访问限制，这个时候就可以通过作用域插槽将组件参数传递出去，供外部调用。怎么传递呢？通过 v-bind 将数据作为属性绑定给 slot，eg, <p><slot v-bind:user="user"></slot></p>, 这样就把组件的数据 user 作为 user 属性，绑定在了 default slot 上。在父级作用域，通过 <user><template v-slot:default="slotProps"></template></user> 来接收 user 组件 default slot 的 props, slotProps 是一个对象，名字任意，是绑定在 default slot 上所有属性的集合。在我们的例子里，就可以通过 slotProps.user 来访问 user 组件提供的 user 数据。作用域插槽的最大用处就在于可以在父作用域通过子组件的数据自定义子组件内容。
  * v-pre， 用来跳过指定元素及其子元素的编译过程 
  * v-one， 元素只渲染一次
+
+### Vue 特殊属性
+* key
+* ref
+* is
+* slot
+* slot-scope
+* scope
+
+### Vue 内置组件
+* component
+* transition
+* transition-group
+* keep-alive
+* slot
