@@ -6,11 +6,11 @@ new Vue({
   //对于 data,props,methods,computed 等Object, vue 对其属性进行了代理，当使用 vm.key 时，等价于 vm.$data.key
   el: "#root", //指定该实例挂载的DOM元素
   data: {},//组件使用的数据，对于组件，data 必须是函数
-  props: {},//定义需要父组件传递给该组件的一些参数
+  props: {},//定义需要父组件传递给该组件的一些参数,可以进行配置, 比如 type/required/default/validator
   template: `<div>{{msg}}</div>`, //用于渲染的模板，
   components:{},//定义该组件使用的子组件，定义之后，则可以在模板里直接使用
   methods: {}, //定义该组件的一些方法
-  computed: {},//定义该组件的一些计算属性，当依赖改变，会自动更新
+  computed: {},//定义该组件的一些计算属性，当依赖改变，会自动更新.计算属性可以有 getter 和 setter.
   watch: {},//可以watch data/props 中的变量，当改变时，触发回调
   
   beforeCreate() {},//hook, 在初始化阶段，init events 和 lifecycle 之后调用
