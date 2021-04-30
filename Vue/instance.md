@@ -13,11 +13,11 @@ new Vue({
   computed: {},//定义该组件的一些计算属性，当依赖改变，会自动更新.计算属性可以有 getter 和 setter.
   watch: {},//可以watch data/props 中的变量，当改变时，触发回调
   
-  beforeCreate() {},//hook, 在初始化阶段，init events 和 lifecycle 之后调用
+  beforeCreate() {},//hook, 在实例初始化之后，init data/events 和 lifecycle 之前调用
   created() {}, //hook，在初始化阶段，完成 数据注入和 支持响应性后调用。该钩子结束后，check 是否指定 el 属性，如果有，则开始进入compile 阶段，如果没有，则等执行 vm.$mount 时，进行compile
                 //在 compile 阶段， 如果有模板，则将模板编译到 render 函数，如果没有，则将 el 的 outerHTML 作为模板进行编译
-  beforeMount() {}, //hook, 在init vm.$el 之前调用。 当 vm.$el 初始化结束，并且将 el 的内容替换为 vm.$el 后，调用mounted
-  mounted() {}, //hook, 在实例挂载到 DOM 元素之后调用
+  beforeMount() {}, //hook, 在init vm.$el 之前调用, 这时候 render 函数被首次调用。 当 vm.$el 初始化结束，并且将 el 的内容替换为 vm.$el 后，调用mounted
+  mounted() {}, //hook, 在实例挂载到 DOM 元素之后调用，并不保证所有的子组件都一起被挂载
   beforeUpdated() {},//hook, 在组件挂载后，销毁前，会一直接收用户输入，当数据改变时，就调用 beforeUpdate
   updated() {}, //当数据改变导致的重新渲染结束，则调用 updated 钩子
   beforeDestory() {},//当组件需要销毁，比如路由路径改变，需要渲染其它组件时，调用 beforeDestory
