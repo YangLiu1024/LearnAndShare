@@ -107,3 +107,23 @@ This library focus on time series components, such as network traffic data. Lowe
 ![commit3](./profiler_flamegraph_commit3.png)
 #### Commit 4
 ![commit4](./profiler_flamegraph_commit4.png)
+### Source Code
+BizCharts only need serveral lines code, but its not easy to understand.
+
+ECharts and HighCharts are similar, define the chart in an <code>option</code> object, and pass the object to chart wrapper, the code is more readable than BizCharts
+
+Nivo has much more configuration options, such as axis, legend, scale, tooltip, color, theme, etc
+
+Plotly has both <code>data</code> and <code>layout</code> configuration option, easy to understand and use
+
+React ChartJs is easy to use, pass the <code>data</code> and <code>options</code> to the chart
+
+React TimeSeries Chart is a little complicate
+
+ReactVis always use ***XYPlot***, and pass each necessary sub component to it. Easy to use.
+
+Recharts is similar with ReactVis, it use *dataKey* for each chart component
+
+Victory is similar with ReactVis and Recharts, config each sub component separately.
+
+Viser is more similar with BizChart, use <code>position</code>, the data key to describle the chart component.
