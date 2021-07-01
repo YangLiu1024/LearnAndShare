@@ -1,5 +1,14 @@
 # Introduction to Next.js
 
+To build a complete web application with React from scratch, there are many important details you need to consider:
+
+* Code has to be bundled using a bundler like webpack and transformed using a compiler like Babel.
+* You need to do production optimizations such as code splitting.
+* You might want to statically pre-render some pages for performance and SEO. You might also want to use server-side rendering or client-side rendering.
+* You might have to write some server-side code to connect your React app to your data store.
+
+A framework can solve these problems. But such a framework must have the right level of abstraction — otherwise it won’t be very useful. It also needs to have great "Developer Experience", ensuring you and your team have an amazing experience while writing code.
+
 Next.js is a React framework, which provide 
 * an intuitive page-based routing system
 * pre-rendering on each *page*, both Static Generation and Server Side Rendering
@@ -65,6 +74,10 @@ Nextjs provide a extension, *'next/image'*, for the `<img>` tag, which support
 * responsive on different screen size
 * only load image when it enter the viewport
 
+Instead of optimizing images at build time, Next.js optimizes images on-demand, as users request them. your build times aren't increased, whether shipping 10 images or 10 million images.
+
+Images are lazy loaded by default. That means your page speed isn't penalized for images outside the viewport. Images load as they are scrolled into viewport.
+
 ```js
 import Image from 'next/image'
 
@@ -93,8 +106,9 @@ To create a reusable component, create a top-level directory named *components*,
 For example, to make all pages share same layout, such as same header and footer, we can add a file called *`layout.tsx`*, and use it as container in each page.
 
 ## Nextjs styled component
-To apply css to component, we can add a css file next to component, and import it as module directly. To do this, the css file suffix should be *module.css*
+To apply css to component, we can add a css file next to component, and import it as module directly. To do this, the css file suffix should be *module.css*. CSS Module will locally scope CSS by automatically creating a unique class name, this allow you to use same CSS class names in different files without worrying about collisions.
 ```css
+/*layout.module.css*/
 .container {
     max-width: 36rem;
     padding: 0 1rem;
@@ -111,6 +125,7 @@ export default function Layout({children}) {
     )
 }
 ```
+for CSS in *node_modules*, we can import it directly
 ## Nextjs Global CSS
 CSS Module is usefull for single component, but if we want to share some CSS among all pages, we need global css file. To support this, Nextjs allow us to create a file under *pages* directory named *_app.tsx* with following content
 ```js
@@ -120,7 +135,9 @@ export default function App({Component, pageProps}) {
 ```
 this *APP* component is the top-level component which will be common across all the different pages.
 
-So to support Global CSS, just import the CSS file in *_app.tsx*. Note that to make it take effect, need to restart the server.
+So to support Global CSS, just import the CSS file in *_app.tsx*. Note that to make it take effect, need to restart the server. And note that global css can only be import from *_app.tsx* file
+
+In production, all CSS Module files will be automatically concatenated into *many minified and code-split* `.css` files.
 
 ## Nextjs Pre-rendering
 By default, Nextjs pre-rendering every page. That means Nextjs generate HTML for each page in advance, instead of having it all done by client-side JS code.
@@ -169,6 +186,24 @@ If the page does not require fetching external data, it will automatically be st
 However, for some pages, it might depend on some external data, you need to access file system, fetch external API, query database at build time. In this case, we should use API *`getStaticProps`*.
 
 In Nextjs, when you export a page component, you can also export an `<async>` function called *`getStaticProps`*. This function runs at build time in production at server side, and inside this function, you can fetch external data and send it as props to the page.
+```js
+export async function getStaticProps(context) {
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
+```
+the *context* parameter is an object containing the following keys:
+- `params` contains the route parameters for pages using dynamic routes. for example, if the page name is `[id].js`, then the `params` will look like `{id: ...}`
+- `preview` is `true` if the page is in preview mode and `undefined` otherwise
+
+And *`getStaticProps`* should return an object with
+- `props` the props that will be received by the page component
+- `revalidate` an optional amount in seconds after which a page re-generation can occur. This means even if a page is generated at build time, it can also be invalidated after specifed time count, server side will regenerate this page when a request come in after the time count. This allow you to update a single page without re-build whole product.
+- `notFound` an optional boolean value to allow the page to return a 404 status and page
+- `redirect` allow to redirect to internal and external resources, should match the shape `{destination: string, permanent: boolean}`
+
+note that if `fallback` is `false` in `getStaticPaths`, the `nouFound` is not necessary.
 
 Note that in development, this function runs on each request instead.
 
@@ -345,6 +380,27 @@ export async function getStaticPaths() {
     }
 }
 ```
+for *fallback* version page,it means the page is rendered with empty props. To check if a page is in *fallback* mode, you can use `next/router`
+```js
+// pages/posts/[id].js
+import { useRouter } from 'next/router'
+
+function Post({ post }) {
+  const router = useRouter()
+
+  // If the page is not yet generated, this will be displayed
+  // initially until getStaticProps() finishes running
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
+
+  // Render post...
+}
+```
+note that for `fallback: true` page, once the page is generated, subsequent request will reuse the generated page, just same as other pre-rendered static page. This option is usefull when you have huge size of static pages, you want to pre-render all those pages, but it will take forever. So we just pick a subset of pages, and use `fallback:true`, then when user request a page which is not in the initially pre-render list, show the *fallback* page first, then run *`getStaticProps`* at backend, when it finished, update the page, add this path to pre-render list.
+
+`fallback:'blocking'` will not show *fallback* page, just block here and wait for the HTML to be generated, identical to *Server Side Render*. When it finished, cache the result for future request, add the path to pre-render list
+
 Similar, we need to implement *`getStaticProps`* at same time
 ```js
 import { getAllPostId, getPostData } from '../../utils/posts'
@@ -378,6 +434,52 @@ return [
 ```
 ## 404 Page
 To create a customized 404 page, create `/pages/404.tsx`. This file is statically generated at build time.
+
+## Nextjs Environment Variables
+Next.js has built-in support for loading environment variables from `.env*` files into `process.env`.
+```js
+//.env.development
+DB_PATH=//localhost:3636
+DB_USER=root
+```
+And the `process.env` can only be accessed in Nextjs data fetching methods and API routes.
+```js
+//pages/index.tsx
+export function getStaticProps = async () => {
+  //note that the process.env here is not a JS object actually,
+  //Nextjs will replace the whole environment variable string to real value at build time
+  const path = process.env.DB_PATH
+  const user = process.env.DB_USER
+}
+```
+
+note that `.env` is used for both *development* and *production* mode, and `.env.development` is used for *development*, `.env.production` is used for *production* mode.
+
+Whats more, we can define `.env*.local` to override the environment variable setting in `.env*`.
+
+And Nextjs will automatically expand variables(`$var`) in environment file, for example
+```js
+HOST_NAME=localhost
+PORT=3000
+HOST_PATH=http://$HOST_NAME:$PORT
+```
+to escape the dollar sign, need to use `\$`
+
+To expose environment to browser, need to add prefix `NEXT_PUBLIC` to the environment variable
+```js
+NEXT_PUBLIC_ENVIRONMENT=Public environment variable
+```
+then it can be used anywhere
+```js
+//pages/index.tsx
+export default function Page() {
+  return (
+    <div>
+      <p>{process.env.NEXT_PUBLIC_ENVIRONMENT}</p>
+    </div>
+  )
+}
+```
 
 ## Depoy to Vercel
 The easiest way to deploy Next.js to production is to use ***Vercel*** platform developed by the creator of Next.js. 
