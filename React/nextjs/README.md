@@ -244,7 +244,7 @@ export async function getStaticProps() {
 ```
 *`getSortedPostsData`* return a array which contain all posts information, including the id, title, date for each md file.
 
-Note that the return value of  *`getStaticProps`* must be an object, and it should has a *`props`* key, and the `allPosts` need to be wrapped in *`props`*. In this way, the *`allPosts`* will be passed to *Home* component as a prop.
+Note that the return value of  *`getStaticProps`* must be an object, and it should has a *`props`* key, and the `allPosts` need to be wrapped in *`props`*. The *`props`* will be passed to Home component as a prop
 
 Besides fetching data from file system, *`getStaticProps`* can also fetch data from external API or database. 
 
