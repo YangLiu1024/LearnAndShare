@@ -11,7 +11,10 @@ Introduction to basic knowledge of JS
   - console.log("")
   - window.print() print current window
 4. a variable declared without value, will have default value <b>undefined</b>. if re-declared the variable, its value will be kept
-5. js comparison. note that when compare number and string, always convert string to number. empty text => 0, non-number text convert to NaN. when compare with NaN, always return false. when compare two objects, always return false, because they are different object.
+5. js comparison. note that when do arithmetic operation(except *addition*) between number and string, always convert string to number. 
+   empty text => 0, non-number text convert to NaN. when compare with NaN, always return false. 
+   when add number and string, convert number to string
+   when compare two objects, always return false, because they are different object.
   - <b>==</b> equal value
   - <b>===</b> equal value and equal type
   - <b>!=</b> different value
@@ -21,12 +24,16 @@ Introduction to basic knowledge of JS
   - null could be asigned to a variable as a kind of special value
   - null == undefined => true, null === undefined => false. because typeof null => object, typeof undefined => 'undefined'
 7. js data types
-  - string
-  - number
-  - boolean
-  - object note that for array, typeof array still return object
-  - function
-  - undefined
+  * primitives:
+    - string
+    - number
+    - boolean
+    - bigint
+    - symbol
+    - undefined
+  * object
+  * function
+  
 8. js operator precedence, list in descend order
   - () expression grouping
   - . [] () new  member access operator and function call and creator
@@ -103,22 +110,99 @@ scripts and all functions on the web.
   //y = 1 here, the y in block shadow the y outside
   ```
   - global var and global let are alomost same, function var and function let are almost same
-31. the const variable behavior like <b>let</b>, except that the const variable could not be reassigned. it means the variable itself is const, but the value it referred is changable. same concept as "pointer constant", the pointer is constant, but its value is not.
-32. const and let does not support hoist. refer to #27
-33. - <b>this</b> in general function always refer to the caller of the function, the window, the document, the object, the button, or whatever
-    - <b>this</b> in arrow function always refer to the owner(who define the function) of the function
-    ```js
-    //regular function, the this always refer to the caller
-    hello = function() {
-       document.getElementById("demo").innerHTML += this;
-    }
-    //arrow function, the this always refer to the owner
-    hello = () => document.getElementById("demo").innerHTML += this;
 
-    window.addEventListener("load", hello); //refer to the window for both regular and arrow function
-    window.getElementById("btn").addEventListener("click", hello)//refer to the button for regular function, refer to window for arrow function
-    ```
-34. regular function definition for object method or class method
+JS has *Global Scope*, *Block Scope* and *Function Scope*. the variable declared outside of any block/function is global variable, can be accessed anywhere. global var has no difference with global let.
+
+let variable declared in block has *block scope*, will shallow outside variable which has same name.
+
+var variable declared in block will hoist itself to global variable.
+
+any variable declared in function has *function scope*, can not be accessed by outside.
+
+31. a function's *this* keyword is determined by how a function is called(runtime binding). 
+    ES5 provide `bind()` method to set the value of a function's *this* regardless of how its called
+    Arrow Function dont provide their own *this* binding, it retatins the this value of the enclosing lexical context
+```js
+const module = {
+  x: 42,
+  getX: function() {
+    return this.x;
+  }
+};
+
+const unboundGetX = module.getX;
+function func() {
+	let x = 10;
+  	console.log(unboundGetX())
+}
+func()//even if unboundGetX is invoked inside a function, its still invoked at the global scope
+
+console.log(unboundGetX()); // The function gets invoked at the global scope
+// expected output: undefined
+
+const boundGetX = unboundGetX.bind(module);
+console.log(boundGetX());//expected output 42
+
+console.log(boundGetX.call({x: 1}))//still output 42, since boundGetX has already bind with module
+console.log(unboundGetX.call({x: 1}))//output 1
+
+function f() {
+  return this;
+}
+//if not in strict mode, since the value of this is not set by the call, this will default to the global object(window) 
+//if in strict mode, if the this is not set when entering an execution context, it remains as *undefined*
+//to set the value of this ti a particular value when calling a function, use 'call()' or 'apply()'
+f() === window
+```
+
+For function *apply*, *call*, *bind*
+```js
+function add(c, d) {
+  return this.a + this.b + c + d;
+}
+
+var o = {a: 1, b: 3};
+
+// The first parameter is the object to use as
+// 'this', subsequent parameters are passed as
+// arguments in the function call
+add.call(o, 5, 7); // 16
+
+// The first parameter is the object to use as
+// 'this', the second is an array whose
+// members are used as the arguments in the function call
+add.apply(o, [10, 20]); 
+
+//if the value passed as 'this' is not an object, will convert it to an object automatically
+function bar() {
+  console.log(Object.prototype.toString.call(this));
+}
+
+bar.call(7);     // [object Number]
+bar.call('foo'); // [object String]
+bar.call(undefined); // [object global], if pass null/undefined as this, will use global object(window)
+
+function f() {
+  return this.a;
+}
+
+var g = f.bind({a: 'azerty'});
+console.log(g()); // azerty
+
+var h = g.bind({a: 'yoo'}); // bind only works once!
+console.log(h()); // azerty
+
+var o = {a: 37, f: f, g: g, h: h};
+console.log(o.a, o.f(), o.g(), o.h()); // 37,37, azerty, azerty
+```
+
+34. - <b>this</b> in general function always refer to the caller of the function, the window, the document, the object, the button, or whatever
+    - <b>this</b> in arrow function always refer to the owner(who define the function) of the function
+
+35. the const variable behavior like <b>let</b>, except that the const variable could not be reassigned. it means the variable itself is const, but the value it referred is changable. same concept as "pointer constant", the pointer is constant, but its value is not.
+36. const and let does not support hoist. refer to #27
+    
+37. regular function definition for object method or class method
    ```js
    var person = {
      hello: function() {return "hello"}
