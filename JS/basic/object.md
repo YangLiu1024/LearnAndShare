@@ -5,10 +5,10 @@ primitive data types are:
 * string
 * number
 * boolean
-* null
 * undefined
+* bigint
 primitive data type has primitive value, primitive value does not contain properties or method, just immutable value
-2. objects are assigned with reference, not value.
+1. objects are assigned with reference, not value.
 ```js
 var person = {}
 var x = person;//x and person and same object, will not copy and create new object, they have same address

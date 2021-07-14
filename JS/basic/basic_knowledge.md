@@ -303,4 +303,5 @@ Model.func3()
   - Object.isSealed(object), check if object is sealed
   - Object.freeze(object), prevent any change to object
   - Object.isFrozen(object)
+  - Object.create(object), create a new object and using the parameter as __proto__, eg, let o2 = Object.create(o1), then o2.__proto__ = o1
   
