@@ -72,3 +72,7 @@ var person = new Person("john", "white");
 Person.prototype.language = "English"//add new property to all existed Person object
 //person.language will be "English" now
 ```
+11. enumerate the properties of an object
+ 1. for...in loop. this loop will traverse all enumerable properties of an object and its prototype chain
+ 2. Object.keys(o), return an array with all the own(not in the prototype chain) enumerable properties names for an object
+ 3. Object.getOwnPropertyNames(o), return an array containing all own properties names(enumerable or not) of an object

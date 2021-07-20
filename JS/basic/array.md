@@ -35,3 +35,21 @@ How to check a variable is array or not
 How to find max or min value of array
 1. Math.max(arr)
 2. Math.min(arr)
+
+数组本质上也是一个对象，只是它的key 默认都是从0 开始的索引。 但是也可以给数组添加非number 的 property
+```js
+let a = [2, 3]
+a.length//2
+a['x'] = 1
+a.length//2, a的 length这里还是2， x会作为 数组对象的属性被存储，但是并不会计入数组长度
+
+let a = new Array(10)
+//等价于
+let a = Array(10)
+//等价于
+let a = []
+a.length = 10
+//数组是一个空数组，只是设置了 长度 length
+```
+
+

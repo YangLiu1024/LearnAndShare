@@ -304,4 +304,8 @@ Model.func3()
   - Object.freeze(object), prevent any change to object
   - Object.isFrozen(object)
   - Object.create(object), create a new object and using the parameter as __proto__, eg, let o2 = Object.create(o1), then o2.__proto__ = o1
+
+39. nullish operator
+    the operator `??` work similar with `||`, but it only return second expression when the first one is `null` or `undefined`.
+    note that `0`, `''` could be regard as valid value in most case, but `0 || 1` will return 1, `0 ?? 1` will return 0
   

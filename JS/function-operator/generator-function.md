@@ -86,3 +86,20 @@ console.log(g.next());//2, false
 console.log(g.next());//4, false
 console.log(g.next());//5, true
 ```
+
+# generator-function and spread
+spread 可以一次性把所有剩下的 yield 的值提取出来
+```js
+function* f() {
+	for (let key of [1,2,3,4,5]) {
+    	yield key
+    }
+}
+
+const gr = f()
+console.log(gr.next().value)//1
+console.log(gr.next().value)//2
+
+console.log([...gr]);//[3, 4, 5]
+console.log(gr.next().done)//true
+```

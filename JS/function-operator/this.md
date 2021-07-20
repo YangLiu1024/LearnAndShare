@@ -65,3 +65,54 @@ console.log(fc.call(o2) === o2)//true
 在构造函数里，this 指向正在创建的对象
 
 在 DOM event handler function 里，this 指向发生事件的 element
+
+```js
+function Person() {
+  // The Person() constructor defines `this` as itself.
+  this.age = 0;
+  let sex = 'male'
+  //函数体内的 this 永远和它的调用者绑定在一起
+  //setTimeout 没有显式调用者，所以它是被全局对象 window 调用的
+  //growUp 是一个inner function, inner function 可以访问外部变量
+  //在 1s 之后，setTimeout 就会直接执行 growUp, 所以 growUp 也是被 window 调用的
+  setTimeout(function growUp() {
+    console.log(this === window)//true
+    console.log(this.age, set)//undefined, male
+    this.age++;
+    console.log(this.age)//NaN
+  }, 1000);
+}
+
+var p = new Person();
+```
+为了解决上面的问题，一个办法是使用一个 outer 变量持有 this, 这样inner function 就可以访问这个变量，从而访问 outer 的this
+```js
+function Person() {
+    this.age = 0;
+
+    let that = this;
+    setTimeout(function growUp() {
+        that.age++
+    }, 1000)
+}
+new Person();
+```
+或者将inner 函数binding 到 outer 的 this
+```js
+function Person() {
+    this.age = 0;
+    function growUp() {
+        this.age++
+    }
+    setTimeout(growUp.bind(this), 1000)
+}
+new Person();
+```
+或者使用箭头函数. 箭头函数的this 永远指向声明该箭头函数的上下文中的this
+```js
+function Person() {
+    this.age = 0;
+    setTimeout(() => this.age++, 1000)
+}
+new Person();
+```
