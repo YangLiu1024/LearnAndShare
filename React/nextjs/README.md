@@ -86,6 +86,8 @@ import Image from 'next/image'
 
 ## Nextjs Head
 To support customize the content for HTML `<head>`, such as page title, etc, Nextjs provide the `<Head>`.
+
+With *Head*, you can config the properties of `document.head` easily, such as `title`, `icon`
 ```js
 import Head from 'next/head'
 
@@ -93,6 +95,7 @@ return (
     <div>
         <Head>
             <title>First Post</title>
+            <link rel="shortcut icon" href="/logo.ico"></link>
         </Head>
         <!-- rest code-->
     </div>
@@ -144,7 +147,7 @@ By default, Nextjs pre-rendering every page. That means Nextjs generate HTML for
 
 Each generated HTML is associated with minimal JS code necessary for that page. When a page is loaded by browser, its JS code runs and make the page fully interactive.
 
-To prove this, you can simply disbale JS on your browser, and refresh your page, you can find the page is still rendered, just without CSS. That's because Nextjs has pre-rendered the page into static HTML, allowing you to see the page without running JS.
+To prove this, you can simply disbale JS on your browser, and refresh your page, you can find the page is still rendered(if in development mode, there is no CSS). That's because Nextjs has pre-rendered the page into static HTML, allowing you to see the page without running JS.
 
 And Nextjs has two forms of pre-rendering: *Static Generation* and *Server Side Render*, the difference is in ***when*** it generate the HTML for a page.
 * Static Generation. Generate the HTML at *build* time, the pre-rendered HTML is then reused on each request.
@@ -445,7 +448,7 @@ DB_USER=root
 And the `process.env` can only be accessed in Nextjs data fetching methods and API routes.
 ```js
 //pages/index.tsx
-export function getStaticProps = async () => {
+export const getStaticProps = async () => {
   //note that the process.env here is not a JS object actually,
   //Nextjs will replace the whole environment variable string to real value at build time
   const path = process.env.DB_PATH
