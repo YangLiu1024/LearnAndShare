@@ -35,9 +35,9 @@ export const getStaticPaths = async () => {
 ```
 the return value for ***getStaticPaths*** is an object,add it must has following properties:
 * paths => an array of object, each object stand for one path, and this object must have a property *params* which in format {params : {id : "ssg-render"}}
-* fallback => the fallback mode, could be `false`/`true`/`block`, *false* means unmatched URL will result in 404 error directly, *true* means when URL unmatched, return fallback version of page firstly, then render the page at backend, finally, send the results to client to update the page. *block* means do not send fallback version to client, block to wait backend finish rendering, then send the result to client
+* fallback => the fallback mode, could be `false`/`true`/`blocking`, *false* means unmatched URL will result in 404 error directly, *true* means when URL unmatched, return fallback version of page firstly, then render the page at backend, finally, send the results to client to update the page. *block* means do not send fallback version to client, block to wait backend finish rendering, then send the result to client
 
-so when *fallback* is `true` or `block`, we need to implement ***getStaticProps***. Note that this method can also work for static route. Just need to remember this method is used to fetch data at build time and then render static page
+After get the paths, we need to implement ***getStaticProps***. Note that this method can also work for static route. Just need to remember this method is used to fetch data at build time and then render static page
 ```js
 //pages/posts/[id].tsx
 export const getStaticProps = async ({params}) => {//for dynamic route, nextjs will pass a context object to this method which contain propery 'params' and 'preview'
