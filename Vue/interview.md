@@ -365,4 +365,187 @@ props: {
 这样不管传入的 level 是多少，都能正确的渲染出来，并且把插槽内容正确的分发到 default 插槽，也避免了在模板里列举出所有的情况。  
 ### createElement
 createElement 有三个参数，第一个参数是需要创建的元素或者组件，第二个参数是可选对象，配置各种参数，第三个参数是节点的子节点内容。
+```js
+//return VNode
+createElement(
+    'div',// string, component对象，或者resolve 上面任何一种的 async function
+    // {Object}
+    {
+
+    },
+    // {String | Array}
+    [
+        'this is title',
+        createElement('h1', 'this is header'),
+        createElement(MyComponent, {
+            props: {
+                propA: 'hello world'
+            }
+        })
+    ]
+)
+```
+#### 配置对象
+```js
+createElement(
+    MyComponent,
+    {
+        class: {//与 v-bind:class 类似，支持 字符串，对象和数组语法
+            foo: true,
+            baz: this.error
+        },
+        style: {
+            color: this.activeColor,
+            fontSize: this.fontSize + 'px'
+        },
+        attrs: {//普通的 HTML attribute
+            id: 'my-component'
+        },
+        props: {
+            propA: this.message
+        },
+        domProps: {
+            innerHTML: 'baz'
+        },
+        on: {//监听组件 MyComponent emit 的自定义 add 事件
+            'add': this.handleClick
+        },
+        slot: 'name-of-slot',
+        scopedSlots: {
+            default: props => createElement('span', props.text)
+        }
+    })
+```
+#### 使用 JS 代替模板指令
+对于 *v-for*, *v-if*, 就可以使用 JS array map 和 if 语句来直接实现其功能。  
+对于 v-model, 就需要自己实现相应的逻辑。
+```js
+props: ['value'],
+render: function (createElement) {
+  var self = this
+  return createElement('input', {
+    domProps: {
+      value: self.value
+    },
+    on: {
+      input: function (event) {
+        self.$emit('input', event.target.value)
+      }
+    }
+  })
+}
+``` 
+这就是深入底层的代价，但是可以更好的控制交互细节。
+#### 事件&按键修饰符
+```js
+on: {
+  keyup: function (event) {
+    // 如果触发事件的元素不是事件绑定的元素则返回
+    if (event.target !== event.currentTarget) return
+    // 如果按下去的不是 enter 键或者
+    // 没有同时按下 shift 键
+    // 则返回
+    if (!event.shiftKey || event.keyCode !== 13) return
+    // 阻止 事件冒泡
+    event.stopPropagation()
+    // 阻止该元素默认的 keyup 事件
+    event.preventDefault()
+    // ...
+  }
+}
+```
+#### 插槽
+*this.$slots* 对象 记录了从父组件传递过来的 每个slot 的内容，key 是 slot 名字，值是 vnode 数组。  
+*this.$scopedSlots* 对象记录了生成父组件传递插槽内容的函数，key 是 slot 名字，值是 function, 该function 参数是作用域插槽绑定的数据，返回值是 vnode 数组.  
+如果 *this.$slots.slotname* 或者 *this.$scopedSlots.slotname* 为空，表示父组件没有提供对应的插槽内容或者作用域插槽函数，则可以在渲染函数里自己通过 createElement 函数创建 slot default content.   
+*scopeSlots* 是作用于渲染函数配置对象里的，其作用是配置对应的根据子组件插槽提供的参数生成 vnode 的函数。
+```html
+<!-- html -->
+<div id="root">
+    <time-counter></time-counter>
+</div>
+```
+```js
+//js
+const counter = {
+  data() {
+  	return {
+    	id: new Date()
+    }
+  },
+	props: ['count'],
+  model: {
+  	prop: 'count',
+    event: 'change'
+  },
+  methods: {
+  	add() {
+    	this.$emit('change', this.count + 1)
+    }
+  },
+/*   template: `<div>
+              <slot :time="id"><span>Counter:</span></slot>
+              <button @click="add">{{count}}</button>
+             </div>`, */
+  render(h) {
+  	let f = this.$scopedSlots.default
+    let label = (f && f({time: this.id})) || h('span', 'Counter:')
+    return h(
+    	'div',
+      [
+      	label,
+        h(
+        	'button',
+          {
+          	on: {
+            	'click': this.add
+            }
+          }, this.count
+        )
+      ]
+    )
+  }
+}
+
+const TimeCounter = {
+	data() {
+  	return {
+    	init: 2
+    }
+  },
+  components: {
+  	counter
+  },
+/*   template: `<counter v-model="init">
+      <template #default="{time}">
+        {{time}}
+      </template>
+  </counter>`, */
+  render(h) {
+  	return h(
+    	'counter',
+      {
+      	on: {
+        	'change': value => this.init = value
+        },
+        props: {
+        	count: this.init
+        },
+        scopedSlots: {
+        	default({time}) {
+          	return time.toString()
+          }
+        }
+      }
+    )
+  }
+}
+
+new Vue({
+	el: "#root",
+  components: {
+  	TimeCounter
+  }
+})
+```
 ## 自定义指令
