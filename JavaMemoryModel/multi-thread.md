@@ -23,16 +23,18 @@ public class Demo {
 比如，对于上例，我们只能确定 *main start* 必然最先打印，*thread start* 也肯定在 *thread end* 之前，至于 *main end* 在 *thread start* 之前，或者 *thread start* 与 *thread end* 之间，抑或在 *thead end* 之后，都是有可能的。这都取决于 CPU 的 调度。
 
 ## 线程状态
-线程在执行 *t.start()* 创建后，处于 *New* 状态，这个时候还没有执行 *run* 方法。  
-在开始执行 *run* 方法时，状态改为 *runable*.  
-如果线程因为某些操作被挂起，比如获取锁，IO操作等， 状态改为 *Blocked*  
-如果线程因为某些操作需要等待，比如 t.wait(), 状态改为 *waiting*  
-如果线程因为 t.sleep(), t.join() 挂起，状态改为 *Time Waiting*
-线程在执行完 *run* 方法或者抛出未捕获异常终止后，状态改为 *Terminated*. 
+Java 线程在运行的生命周期中给定时刻，只会处于下列状态中的其中一个。
+线程在创建后，处于 *New* 状态，这个时候还没有执行 *start* 方法。表示初始状态  
+在线程就绪或执行 *run* 方法时，状态为 *runable*.表示运行状态  
+如果线程阻塞于 synchronized 锁， 状态为 *Blocked*, 表示阻塞状态  
+如果线程需要等待其它线程做出一些特定动作(通知或中断)，比如 t1.wait(), t2.notify(), 状态为 *waiting*, 表示等待状态  
+如果线程在等待后可以自动返回，比如 t.sleep(), 状态为 *Time Waiting*, 表示超时等待状态
+线程在执行完 *run* 方法或者抛出未捕获异常终止后，状态改为 *Terminated*. 表示终止状态
 
 ## 线程中断
 如果一个线程消耗了太多时间还没有结束，比如网速太慢，下载一直没有完成，则用户可以 cancel 该任务，即中断下载线程。  
 在 Java 里，中断线程可以使用 *t.interrupt()* 方法，表示在当前线程中去中断 t 线程。  
+而每个线程有一个标志位来记录当前线程是否被中断, 线程可以通过 *inInterrupted* 来检查自己是否被中断。但注意，如果一个线程已经终结，即使它被中断过，*isInterrupted* 也会返回 false
 ```js
 public class Main {
     public static void main(String[] args) throws InterruptedException {
@@ -75,14 +77,16 @@ class HelloThread extends Thread {
     }
 }
 ```
-*t.interrupt* 会给线程 t 发送中断请求。如果 t 线程本身已经处于等待状态，则该线程会抛出 InterruptedException 异常。如果不处于等待状态，可以通过 *isInterrupted* 来判断当前线程是否已经中断。
+*t.interrupt* 会给线程 t 发送中断请求。如果 t 线程本身已经处于等待状态，则该线程会抛出 InterruptedException 异常。  
+注意在抛出异常前，JVM 会清除中断标志，此时若检查 *isInterrupted*, 会返回 false.  
+更安全的中断线程的方法不是通过 *interrupt* 方法，而是通过 Boolean 变量来控制线程是否需要继续运行。 
 
 ## 守护线程
 JVM 运行时，主线程可以创建多个子线程，当所有线程都运行结束时，JVM 才能退出，进程结束。  
 如果有一个线程没有结束，则 JVM 不会退出，进程不能结束。  
 但是在有的时候，有的线程本身就是想要无限循环，比如计时线程，也没有其它线程来负责结束该线程，这个时候该怎么办呢？  
 答案是创建守护线程，在线程 start 之前， 调用 *t.setDaemon(true)*  
-当所有工作线程都结束后，JVM 无论有没有守护线程，都会自动退出。  
+当所有工作线程都结束后，JVM 无论有没有守护线程，都会自动退出。退出时，所有守护线程都需要立即终止，但是JVM 并不保证守护线程退出时，它的 finally 代码块一定会被执行。  
 
 ## 线程同步
 当多线程同时运行时，线程的调度由系统决定，程序本身无法决定。因此，任何一个线程都可能在任意指令处暂停，然后在某个时间段后继续执行。  
@@ -194,18 +198,21 @@ class TaskQueue {
         while (queue.isEmpty()) {
             //object.wait() 必须在持有该 object 作为锁的线程中调用
             //如果调用该方法的线程没有持有 object 的锁，则抛出 IllegalMonitorStateException 异常
-            //成功调用后，该锁会与当前线程解绑，锁资源被释放，且线程被挂起，不会被 CPU 调度
+            //成功调用后，该锁会与当前线程解绑，锁资源被释放，进入 wating 状态，线程被挂起，不会被 CPU 调度
             //直到被其它线程唤醒，或者被 interrupt, wait 方法才会返回，且当前线程又会尝试获取锁，然后继续执行后面的代码
             this.wait();
         }
         return queue.remove();
     }
 ```
-所以，*wait* 方法只能在同步代码块里调用，且只能被锁对象调用。  
+所以，*wait* 方法只能在同步代码块里调用，且只能被锁对象调用。wait(long) 也可以指定等待时长，单位为毫秒，若超过时长，则自动返回。    
 接下来，剩下的问题，就是怎么通知 wait 的线程。  
 ```js
 public synchronized void addTask(String s) {
     this.queue.add(s);
+    //notify 是将waiting 队列里的某个线程移动到 entry 队列，状态由 wating 改为 blocked
+    //notifyAll 是将 wating 队列里所有线程移到 entry 队列
+    //这些唤醒的线程需要重新竞争锁，竞争成功，才能从 wait 方法返回，继续执行之后的代码，竞争失败，继续 blocked
     this.notify(); // 唤醒在this锁等待的线程
 }
 ```
