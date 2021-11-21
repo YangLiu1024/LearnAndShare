@@ -549,3 +549,33 @@ new Vue({
 })
 ```
 ## 自定义指令
+除了 Vue 内置的指令外，Vue 也支持自定义指令。虽然代码复用的主要形式是组件，但是有的情况下，你仍然需要对普通 DOM 元素进行底层操作，这个时候就需要用到自定义指令。  
+指令分为全局指令和局部指令，全局指令通过 *Vue.directive('name', {...})* 来定义，局部指令可以在组件构建选项 *directives: {name: {...}}* 定义。注意，指令名字为 *name*, 那么使用的时候，是 *v-name*.  
+指令的使用形式为 <code>v-name:prop.modifier="expression"</code>
+### 钩子函数
+一个指定定义对象可以提供如下几个钩子函数(均为 optional)
+* bind, 只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化操作
+* inserted, 在绑定元素插入到父节点时调用(仅保证父节点存在，但是不一定已经被插入到文档中)
+* update, 所在的组件 VNode 更新时调用，但是可能发生在其子 VNode 更新之前。指令的值可能发生了改变，也可能没有。
+* componentUpdated, 指令所在组件的 VNode 以及子 VNode 全部更新后调用
+* unbind, 只调用一次，指令与元素解绑时调用
+
+### 钩子函数参数
+指令钩子函数会传入以下参数：
+* el, 指令绑定的 DOM 元素，可以用来直接操作 DOM
+* binding, 一个对象，包含了指令的所有属性
+   - name: 指令的名字，不包括 *v-* 前缀
+   - value: 指令 expression 的值，注意不是表达式，而是表达式的值，比如 v-my-directive="1 + 1", value 为 2
+   - oldValue, 表达式之前的值，仅在 update, componentUpdated 钩子中可用
+   - expression, 指令表达式
+   - arg: 传给指令的参数，比如 v-my-directive:foo="1+1", arg 则为 *foo*
+   - modifiers: 一个包含修饰符的对象，比如 v-my-directive.foo.bar, 则 modifiers 为 *{foo: true, bar: true}*
+* vnode, 编译生成的 vnode 节点
+* oldVnode, 上次编译生成的 vnode
+
+除了 el 之外，其它参数都是只读的，切勿进行修改.
+
+### 动态指令参数
+指令所绑定的参数也可以是动态的，其形式为 <code>v-name:[prop].modifier="expression"</code>.  
+比如，我们有一个指令 *v-pin="200"* 可用把绑定元素固定在页面上，但是这个 200 是作用域 top, left, 还是 right 等，就可以通过动态参数来决定。*v-pin:[direction]="200"*
+
