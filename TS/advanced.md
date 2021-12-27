@@ -106,6 +106,206 @@ MyPoint.prototype = p
 //那么 mp 就可以使用 p 的所有属性，相当于 mp 继承了 p
 //mp.z 访问自己 own 的属性，mp.x 访问 mp.__proto__ 即 p 的属性，mp.distance 访问 p.__proto__ 即 Point.prorotype 的属性，Point.prototype.__proto__ 指向了 Object.prototype, Object.prototype.__proto__ = null
 let mp = new MyPoint(3)
-
 ```
+ES6 提供了 class 语法，支持使用 constructor, super, static, get, set 等关键字  
+对于getter/setter
+```js
+//在通过 Object.defineProperty(obj, prop, config) 定义对象的属性时，可以对该属性进行配置， 包括 value/writable/enumerable/configurable/get/set, get/set 和 value/writable 不可同时存在.value 默认值为 undefined, writable/enumerable/configurable 默认值为 false.    
+//在对象初始化时，也可以直接定义属性的 getter/setter, 该属性一般不能与其它属性同名，如果同名，只有最后作出定义的属性有效。getter/setter 默认值为 undefined, enumerable/configurable 默认值为 true.  
+//对象的属性都有自己的 descriptor, 可以通过 Object.getOwnPropertyDescriptor(obj, prop)
+let a = {y: "1"}
+Object.defineProperty(a, "x", {
+    value: "1",
+    writable: false//x 不可写
+    //或者定义 get/set
+    get() {
+        return this.y//如果一个属性定义 get/set, 那么它一般来说是作为计算属性使用，即依赖于其它的属性
+    },
 
+    set(v) {
+        this.y = v
+    }
+})
+
+let o = {get z() {return "1"}}
+console.log(Object.getOwnPropertyDescriptor(o, z))//{get(){...}, set:undefined, enumerable: true, configuable: true}
+```
+在 class 里， get/set 用来定义实例对象的属性
+```js
+class Animal {
+    age = 0//ES7里支持类内直接初始化属性，ES6只能在构造函数体内初始化
+    static count = 100
+    constructor(name) {
+        this.name = name;
+    }
+    sayHi() {
+        return `My name is ${this.name}`;
+    }
+
+    get name() {//任何访问 Animal 实例对象的 name 属性，返回都是 Jack
+        return 'Jack'
+    }
+
+    set name(value) {//任何对 Animal 实例对象的 name属性进行赋值的操作都只会打印
+        console.log('setter:', value)
+    }
+    //static 语法其实就相当于把该方法定义在了 Animal 函数对象本身上面
+    //普通函数或者属性，其实就是添加到了Animal 函数对象 prototype 属性上
+    static isAnamal(o) {
+        return o instanceof Animal
+    }
+}
+//类的继承使用 extends
+class Cat extends Animal {
+  constructor(name) {
+    super(name); // 调用父类的 constructor(name)
+    console.log(this.name);
+  }
+  sayHi() {
+    return 'Meow, ' + super.sayHi(); // 调用父类的 sayHi()
+  }
+}
+```
+上述的例子都还停留在 JS, 在 TS 里，对 class 的定义有增强，它允许对属性添加 public/private/protected 修饰符，它们的作用和 Java 里的修饰符是一样的。  
+```js
+//animal.ts
+class Animal {
+  private name;
+  public constructor(name) {
+    this.name = name;
+  }
+}
+
+let a = new Animal('Jack');
+console.log(a.name);//TS 报错，因为 a.name是 private, 不应该被外部直接调用
+a.name = 'Tom';//TS 报错
+```
+需要注意的是，这里的错误只是 TS 报出的编译期错误，编译后的结果也会删掉修饰符，在运行时，也并不会出错。  
+TS 只是在编译器帮助开发者维护类属性的访问权限控制，就和 Java 一样，只是在编译后，仍然可以运行。  
+除了访问权限修饰符， TS 还支持使用 readonly 来修饰属性。  
+```js
+class Animal {
+    public readonly name: string//如果 readonly 和其它修饰符一起使用，需要写在后面
+    constructor(name: string) {
+        this.name = name
+    }
+}
+
+let a = new Animal("Tom")
+a.name = "Kitty"//报错
+```
+TS 还支持抽象类，即使用 abstract 来修饰 class 以及 class 内的 抽象方法  
+```js
+abstract class Animal {
+  public name;
+  public constructor(name) {
+    this.name = name;
+  }
+  public abstract sayHi();
+}
+
+let a = new Animal('Jack');//报错，不应该创建抽象类实例
+```
+和 Java 里概念一样，抽象类不允许实例化，且继承类必须实现其抽象方法。  
+当然，这些限制都是 TS 添加的编译器限制，在运行时，实际上并没有这些限制。
+
+# 类与接口
+TS 里的接口和 Java 里的接口非常相似，都是对对象行为的抽象。  
+类可以实现一个或多个接口，接口也可以继承另一个接口。 值得注意的是，在 TS 里，接口是可以继承类的。  
+```js
+class Point {
+    x: number;
+    y: number;
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
+//上面的代码，在 TS 里，除了创建一个构造函数 Point 外，还会声明一个 Point 类型, 相当于
+Function Point(x, y) {...}
+type Point = {x: number, y: number}//这个类型会包含类的实例属性和实例方法，其它如构造函数，静态方法，属性是不会被包含的
+
+//在这里，Point 是作为类型而不是类来使用的，这个类型具有x,y 两个属性
+//所以本质上，其实还是接口继承于接口
+interface Point3d extends Point {
+    z: number;
+}
+
+let point3d: Point3d = {x: 1, y: 2, z: 3};
+```
+# 泛型
+泛型是指，在定义接口，函数或者类的时候，不预先指定具体类型，而在使用的时候再指定类型的一种特性。  
+```js
+function createArray<T>(length: number, value: T): Array<T> {
+    let result: T[] = [];
+    for (let i = 0; i < length; i++) {
+        result[i] = value;
+    }
+    return result;
+}
+
+createArray<string>(3, 'x');//这里的 string 也可以不写，因为类型推导可以推导出来
+
+//当然也可以指定多个泛型参数
+function swap<T, U>(tuple: [T, U]): [U, T] {
+    return [tuple[1], tuple[0]];
+}
+
+swap([7, 'seven'])
+```
+## 泛型约束
+使用泛型变量时，因为不知道具体类型，不能随意操作它的属性或方法，我们可以对泛型进行约束让它至少满足要求。
+```js
+interface Lengthwise {
+    length: number;
+}
+
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+    console.log(arg.length);
+    return arg;
+}
+```
+需要注意的是，TS 里类型的的继承并不是说需要我们必须声明 A extends B, 才能说 A 继承了 B, 只要 A 包含 B 里要求的所有的属性，那么就可以说A 继承了 B.  
+多个泛型参数之间也可以互相约束
+```js
+//要求 T 继承 U, 保证 U 上不会出现 T 没有的属性
+function copyFields<T extends U, U>(target: T, source: U): T {
+    for (let id in source) {
+        (target as U)[id] = source[id];
+    }
+    return target;
+}
+
+let x = { a: 1, b: 2, c: 3, d: 4 };
+
+copyFields(x, { b: 10, d: 20 });
+```
+上面的示例说明了怎么在函数定义里使用泛型，那么在函数类型声明里，该怎么使用泛型呢
+```js
+type CreateArray = <T>(length: number, value:T) =>  Array<T>
+
+let ca: CreateArray = function<T>(len: number, v: T): Array<T> {
+    let res: T[]= []
+    for (let i = 0; i < len; i++) {
+        res[i] = v;
+    }
+    return res
+}
+```
+当然也还可以将泛型应用到类的定义里
+```js
+//我们还可以为泛型参数指定默认值，当没有显示指定，也不能通过推导判断时，使用默认参数
+class MyArray<T = string> {
+    values: T[] = [];
+    get length() {
+        return this.values.length
+    }
+
+    set length(len: number) {
+        
+    }
+    add(v: T) {
+        this.values.push(v)
+    }
+}
+```
