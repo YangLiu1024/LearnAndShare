@@ -50,7 +50,7 @@ const MyArray = [
   { name: "Eve", age: 38 },
 ];
 //这里的 number 也可以替换为任意数字
-type P = typeof MyArray[number]//type P = {name: string; age: number}
+type P = typeof MyArray[number]//type P = {name: string; age: number}, 如果数组元素类型不一致，会返回所有元素类型的 union
 
 //有的时候，我们想获取一个对象特定key 的 value 的 type,
 type NameOf<T> = T["name"]//这个时候 TS 会报错，因为 T 可能没有属性 name
@@ -120,6 +120,12 @@ type Concrete<Type> = {
 还支持 key 的重命名
 ```js
 type Getters<Type> = {
+    //Capitalize<string & Property> 要求 Property 本身是字符串，如果是 number, number & string 会返回 never, 那么该 Property 会被过滤掉
+    // type T = {
+    //   1: number;
+    //   a: string;
+    // }
+    // Getters<T> 里，Property 1 则会被过滤掉，返回类型里只有 a, 因为 1 本身的类型是 number
     [Property in keyof Type as `get${Capitalize<string & Property>}`]: () => Type[Property]
 };
  
@@ -155,7 +161,60 @@ type Greeting = `hello ${World}` // type Greeting = "hello world"
 type People = "Tom" | "Jerry" | "David"
 type Greeting = `hello ${People}`// 返回 "hello Tom" | "hello Jerry" | "hello David"
 ```
+比如我们现在有一个 plain object, 需要为它添加所有 field 的 onChange listener
+```js
+enum SEX = {
+  MALE,
+  FEMALE,
+  OTHER
+}
+const p = {
+  name: "yangliu",
+  age: 20,
+  sex: SEX.MALE
+}
+type P = typeof p;
+//现在想生成一个类型，该类型具有 p 的所有属性，并且为每个属性添加一个 change listener, 该 listener 的参数为 一个回调，该回调的参数是属性的值
+type Person = {
+  [Prop in keyof P as `on${Capitalize<string & Prop>}Changed`]: (v: P[Prop]) => void
+} & P
+// type Person = {
+//     onNameChanged: (v: string) => void;
+//     onAgeChanged: (v: number) => void;
+//     onSexChanged: (v: SEX) => void;
+// } & {
+//     name: string;
+//     age: number;
+//     sex: SEX;
+// }
 
+```
+或者只为对象添加一个属性 on, 它的值是一个注册回调的函数，该函数接受两个参数，第一个参数是事件名字，第二个参数是对应的回调函数，该回调函数的参数为监听的属性的值
+```js
+type Regist<T> = {
+  //这样写只能限制事件名的类型，但是对于回调函数，它的参数的类型没法限制，只能使用 any
+  on:(event: `${string & keyof T}Changed`, callback:(v: any) => void) => void
+}
+//为了做出更精确的限定，需要对 callback 的参数也做出限制，那么该怎么做呢？
+//为了让事件名和回调都能从泛型里获取信息，那么就需要将泛型信息往上提，即提到函数 on 的层次，因为函数本身也是支持泛型的
+type Regist<T> = {
+  on<Key extends string & keyof T>(eventName: `${Key}Changed`, callback:(v:T[Key]) => void):void
+}
+```
+# Intrinsic String Manipulation Types
+TS 内置提供了一些用来操作字符串类型的类型， 比如 Uppercase<T>, Lowercase<T>, Capitialize<T>, Uncapitialize<T>  
+这些类型的实现细节
+```js
+function applyStringMapping(symbol: Symbol, str: string) {
+    switch (intrinsicTypeKinds.get(symbol.escapedName as string)) {
+        case IntrinsicTypeKind.Uppercase: return str.toUpperCase();
+        case IntrinsicTypeKind.Lowercase: return str.toLowerCase();
+        case IntrinsicTypeKind.Capitalize: return str.charAt(0).toUpperCase() + str.slice(1);
+        case IntrinsicTypeKind.Uncapitalize: return str.charAt(0).toLowerCase() + str.slice(1);
+    }
+    return str;
+}
+```
 # infer
 infer 用来在进行类型推导时，如果类型推导成功，则将推导出来的类型，赋给 infer 后跟的类型名。
 ```js
