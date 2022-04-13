@@ -52,4 +52,34 @@ void transfer(Entry[] newTable, boolean rehash) {
 e 指向 key(7), key(7) 的 next 已经在线程 1 里改为指向了 key(3), 所以这里 next 指向 key(3). e.next = newTable[3], 这里 newTable[3] 指向 key(3), 所以 key(7) 的 next 又指向了 key(3), newTable[3] 指向 key(7), 进入下一步迭代。   
 key(3) 的 next 在线程1 里已经改为 null, e.next = newTable[3], 那么 key(3) 的 next 又会指向 key(7). 这时 key(3) 和 key(7) 形成环形链表, 且 key(5) 已经被丢失了。
 
+### HashTable 效率低下
+HashTable 使用 synchronized 保证线程安全，但是在多线程条件下，所有访问同步方法的线程都要竞争锁， 效率太低。
+### ConcurrentHashMap 锁分段
+HashTable 效率低下是因为所有线程在争同一把锁，假如容器有多把锁，不同锁作用于不同数据段，那么访问不同数据段的线程就不需要竞争同一把锁，自然提高了并发访问效率。    
+首先将数据分成一段一段的存储，然后给每一段数据都配一把锁，当一个线程占用锁访问其中一个数据段时，其它数据段的数据也能被其它线程访问。这就是锁分段技术。
 
+## ConcurrentHashMap 数据结构
+ConcurrentHashMap 底层分为多个 segment, 每个 segment 有自己的 lock, 也有自己的 数据 HashEntry 数组， 每个 HashEntry 就相当于一个链表。  
+在访问  ConcurrentHashMap 时，会首先对 key 的 hashcode 再进行一次散列来定位对应的 segment, 再散列是为了减少散列冲突，让元素能够均匀的分布在不同的 segment 上。   
+## get
+get 操作很简单，只需要先定位 segment, 然后直接取值, 并不需要加锁。这是因为 HashEntry 的 value 是 volatile 的，如果有线程改变了值，任何之后其它线程的读，都会拿到最新数据。
+## put 
+put 方法会在 segment 上加锁，然后插入数据。
+## size
+每个 segment 都有自己的 volatile 变量 count 表示大小，那么整个 map 的size 是否只需要简单的将所有 segment 的 count 相加就可以呢？   
+答案并不是，因为即使 count 是 volatile 的，在累加过程中，如果前面的 segment count 发生变化，累加的 线程是感知不到的，因为 那个 segment 的 count 已经读过了。   
+那么安全的做法就是，在计算 size 的时候，将所有 segment 给锁住，这样就不会出问题，但是这样明显低效。   
+ConcurrentHashMap 的做法是，先尝试两次不锁 segments 的方式统计各个 segment 的大小，如果在统计过程中，容器的 count 发生变化，再通过加锁的方式来统计大小。   
+那么ConcurrentHashMap是怎么知道 count 发生了变化呢？ 答案是 modCount 变量。 在 put, remove, clean 方法里操作元素前都会将变量 modCount 加 1，那么在统计 size 的前后比较 modCount 是否发生变化，就可以知道 count 是否发生了变化。
+
+# ConcurrentLinkedQueue
+线程安全的队列可以通过阻塞和非阻塞的方法实现，阻塞的话，就使用锁，可以出队入队用同一把锁，也可以出队入队用不同的锁。非阻塞的话，就通过循环 CAS 来实现。   
+## 结构
+ConcurrentLinkedQueue 有一个 head 节点，一个 tail 节点，每个节点都有该节点的数据，以及指向下一个节点的 next 引用。初始情况下，tail = head, 且 head 的数据为空，next 为 null
+## 入队列
+
+
+# BlockingQueue
+在入队时，如果队列已满，阻塞入队的线程。在出队时，如果队列已空，阻塞出队的线程。
+# Fork/Join
+Fork 就是把大任务划分为可以并行执行的小任务，Join 就是把小任务的结果汇总。   
