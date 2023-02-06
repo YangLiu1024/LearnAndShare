@@ -10,7 +10,7 @@ type Point = {
     4：string
 }
 
-type KP = keypf Point;//type KP = "x" | "y" | 4
+type KP = keyof Point;//type KP = "x" | "y" | 4
 
 //如果类型声明里，使用了 index signature, keyof 会返回 key 的 type
 type Arrayish = { [n: number]: unknown };

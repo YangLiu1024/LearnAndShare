@@ -1,0 +1,46 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - HashDemo",
+            "request": "launch",
+            "mainClass": "HashDemo",
+            "projectName": "LearnAndShare_c899026f"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - ReadWriteLock",
+            "request": "launch",
+            "mainClass": "ReadWriteLock",
+            "projectName": "LearnAndShare_c899026f"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - TwinsLock",
+            "request": "launch",
+            "mainClass": "TwinsLock",
+            "projectName": "LearnAndShare_c899026f"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - ThreadPool",
+            "request": "launch",
+            "mainClass": "ThreadPool",
+            "projectName": "LearnAndShare_c899026f"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - MultiThread",
+            "request": "launch",
+            "mainClass": "MultiThread",
+            "projectName": "LearnAndShare_c899026f"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Test",
+            "request": "launch",
+            "mainClass": "Test",
+            "projectName": "LearnAndShare_c899026f"
+        }
+    ]
+}
