@@ -2,8 +2,12 @@
 浏览器是多进程的，一般有 core 进程，渲染进程等。渲染进程又分为多条子线程，比如渲染线程，JS 线程，DOM事件响应线程等。且渲染线程与 JS 线程是互斥的，当执行 JS 线程时，页面渲染时阻塞的。    
 JS 在设计之初，就采用单线程设计，但是为了避免某些任务执行时间太长，导致渲染线程得不到执行，JS 采取异步执行的策略。  
 异步即是指在主线程碰到异步任务时，会将异步任务的回调函数 push 到任务队列，等待之后再执行。当主线程执行完所有当前的同步代码，就会去遍历任务队列，从任务队列中提取任务执行。  
-任务有两种类型，宏任务和微任务。宏任务是指 setTimeout, setInterval, I/O, 网络请求等触发的任务。微任务是指 Promise, process.nextTick 等触发的任务。  
-主线程在执行完同步代码后，在当前轮任务轮询中，会先执行完当前所有的微任务，然后再去宏任务里提取第一个宏任务执行。并以此循环。
+任务有两种类型，宏任务和微任务。宏任务是指 setTimeout, setInterval, I/O, *script*, 网络请求等触发的任务。微任务是指 Promise, process.nextTick 等触发的任务。  
+事件循环就是指，首先取出一个宏任务，即 script tag 包含的js 代码，将该 script 压入执行栈。期间产生的任务压入任务队列。  
+在执行栈结束后，去检查微任务队列，开始执行微任务。在执行微任务期间产生的其它任务也会压入任务队列。一直执行直到微任务队列为空。  
+然后开始渲染 ui.  
+渲染结束后，从宏任务队列里取出一个任务，压入执行栈开始执行。循环往复。  
+可以参考 https://jsfiddle.net/sn9xrkeg/
 ```js
 //定义了 4个 async 函数
 async function af1(p) {
@@ -48,13 +52,27 @@ async function aaf(p = '') {
 // 这个时候，打印 'time out 1', 然后继续执行 aff('tt') 函数
 // aff('tt') 里，开始执行 af1, 打印 'tt async function 1', af1 之后的代码被 push 到 微任务队列里。现在 微任务队列里有三个回调函数了
 // aff('tt') 执行结束，打印 'time out 2'
+// 1 
+// '' async function1
+// 2
+// '' async function2
+// af2
+// '' async function3
+// '' async function4
+// af4
+// timeout1
+// 'tt' async function1
+// time out 2
+// tt async function2
+// af2
+
 console.log(1)
 aaf()
 setTimeout(() => {
   console.log('time out 1');
   aaf('tt');
   console.log('time out 2');
-}, [0])
+}, 0)
 console.log(2)
 // 1
 // async function 1
@@ -87,15 +105,20 @@ setTimeout(async () => {
 ```
 比如当有多层 await 函数时
 ```js
+// 1 '' 'async function1' 'f' 8 'ff' 10 [await ff]
+// 2
+// 'f' 88
+// 8
+// 'af1' 
 async function ff() {
 	console.log('ff', 10)
   return 10
 }
 async function f() {
-console.log('f', 8)
-await ff();
-console.log('f', '88')
-return 8
+  console.log('f', 8)
+  await ff();
+  console.log('f', '88')
+  return 8
 }
 async function af1(p='') {
   console.log(p, 'async function1')
@@ -105,8 +128,5 @@ async function af1(p='') {
 console.log(1)
 af1().then(v => console.log(v))
 console.log(2)
-// 首先打印 1
-// 然后执行 af1 函数， 打印 async function 1
-// 然后执行 await f, 进入 f 函数， 打印 f8, 然后进入 await ff, 执行 ff 函数，打印 ff10, 并且返回 10
-// 
+
 ```
