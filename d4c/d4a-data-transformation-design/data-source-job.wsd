@@ -1,0 +1,27 @@
+@startuml data-source-job
+
+interface Transformation {
+
+}
+
+interface TransformationGroup {
+    transformation: Transformation[]
+    dependencies?: TransformationGroup
+}
+
+
+interface Job {
+    transformation: Transformation
+    dependencies: number[];
+}
+
+interface JobConverter {
+    toJobQueue(transformations: TransformationGroup[]): Job[]
+}
+
+Transformation ..> Job
+Transformation ..> TransformationGroup
+TransformationGroup ..> TransformationGroup
+TransformationGroup ..> JobConverter
+Job ..> JobConverter
+@enduml

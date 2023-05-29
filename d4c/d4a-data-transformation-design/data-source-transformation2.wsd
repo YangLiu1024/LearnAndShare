@@ -1,0 +1,60 @@
+@startuml data-source-transformation
+left to right direction 
+
+class TransformationResult {
+    databasePath: string
+    tableMetaInfo: TableMetaInfo
+}
+
+class DataSourceAddCalculatedColumnOperation {
+    type: 'ADD_CALCULATED_COLUMN'
+}
+
+class DataSourceAddFilterOperation {
+    type: 'ADD_FILTER'
+    
+}
+
+interface DataSourceOperation {
+    result: Load<TransformationResult>
+}
+
+DataSourceAddCalculatedColumnOperation --> DataSourceOperation
+DataSourceAddFilterOperation --> DataSourceOperation
+
+
+class DataSourceCreateTransfomration {
+    type: 'CREATE'
+}
+
+class DataSourceAddRowsTransformation {
+    type: 'ADD_ROWS'
+    dependency: DataSourceCreateTransfomration
+}
+
+class DataSourceAddColumnsTransformation {
+    type: 'ADD_COLUMNS'
+    dependency: DataSourceCreateTransfomration
+}
+
+interface DataSourceTransformation {
+    result: Load<TransformationResult>
+    operations: DataSourceOperation[]
+}
+
+DataSourceCreateTransfomration --> DataSourceTransformation
+DataSourceAddRowsTransformation --> DataSourceTransformation
+DataSourceAddColumnsTransformation --> DataSourceTransformation
+
+TransformationResult ..r-> DataSourceOperation
+TransformationResult ..> DataSourceTransformation
+DataSourceOperation ..r-> DataSourceTransformation
+
+interface DataSource {
+    id: string
+    name: string
+    transfomrations: DataSourceTransformation[]
+}
+
+DataSourceTransformation ..> DataSource
+@enduml
