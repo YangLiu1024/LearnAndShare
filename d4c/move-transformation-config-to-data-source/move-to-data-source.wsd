@@ -1,0 +1,41 @@
+@startuml move to data source
+
+interface TableMetaInfo {
+
+}
+
+interface TransformationResult {
+    String databasePath;
+    TableMetaInfo tableMetaInfo;
+}
+
+
+class TransformationConfig {
+    -<s>C dataSouce</s>;
+    +Observable<TransformationResult> finalResult()
+}
+
+class DashboardDataSource {
+    -String id;
+    -<s>String dataSourcePath</s>;
+    -String type;
+    -<s>String databasePath</s>;
+    -Strind dataSourceName;
+    -<s>TableMetaInfo tableMetaInfo</s>;
+
+    -<color:green>TransformationConfig transformationConfig</color>
+}
+
+class AppStore {
+    -DashboardDataSource[] dataSources;
+    -<color:green>String selectedTransformationDataSourceId</color>;
+    -<s>TransformationDashboard transformationDashboard</s>;
+
+    +<s>Observable<TransformationConfig> selectedTransformationConfig()</s>
+    +<s>void updateDataSourceResult(DashboardDataSource dataSource, Observable<TransformationResult> result)</s>
+}
+TableMetaInfo ..> TransformationResult
+TransformationResult ..> TransformationConfig
+TransformationConfig --> DashboardDataSource
+DashboardDataSource --> AppStore
+@enduml

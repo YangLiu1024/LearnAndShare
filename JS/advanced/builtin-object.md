@@ -164,7 +164,28 @@ const handler = {
     },
     setPrototypeOf(obj, proto) {// 拦截 Object.setPrototypeOf, Reflect.setPrototypeOf
 
+    },
+    getOwnPropertyDescriptor(obj, name) {// 拦截 Object.getOwnPropertyDescriptor 和 Reflect.getOwnPropertyDescriptor
+
+    },
+    isExtensible(obj) {// 拦截 Object.isExtensible, Reflect.isExtensible
+
+    },
+    preventExtensions(obj) {//拦截 Object.preventExtensions, Reflect.preventExtensions
+
     }
 }
 
+```
+除了这些之外，proxy 还可以拦截函数对象的调用
+```js
+const hander = {
+    // target 是目标函数，thisArg 是被调用时的上下文
+    apply(target, thisArg, argumentsList) {// 可以拦截 proxy(...args), Function.prototype.apply, Function.prototype.call, Reflect.apply
+
+    },
+    construct(target, args) { // target 需要是有[[Construct]] 方法的函数对象，可以拦截 new proxy(...args) 和 Reflect.construct(proxy, args)
+
+    }
+}
 ```

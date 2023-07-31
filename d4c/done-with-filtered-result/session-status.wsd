@@ -1,0 +1,45 @@
+@startuml session-status
+left to right direction
+
+package gui-server-interface {
+package "shared.thrift" {
+    enum CommonStatus {
+        NEW = 1,
+        RUNNING = 2,
+
+        ESTIMATE_RUNNING = 16,
+        +DOME_WITH_FILTERED_MARKS = 17,
+        +DONE_WITH_FILTERED_TARGETS = 18
+    }
+}
+
+package "d4c_service_handler.py" {
+    struct STATUS_MAPPING {
+        "NEW": CommonStatus.NEW
+        "Running": CommonStatus.RUNNING,
+
+        +"Done with filtered marks": CommonStatus.DONE_WITH_FILTERED_MARKS,
+        +"Done with filtered targets": CommonStatus.DONE_WITH_FILTERED_TARGETS,
+    }
+}
+
+package run_session {
+    Object status_map
+}
+}
+package gui {
+enum Status {
+    NEW,
+    RUNNING,
+
+    ESTIMATE_RUNNING,
+    +DONE_WITH_FILTERED_MARKS("Done with filtered marks")
+    +DONE_WITH_FILTERED_TARGETS("Done with filtered targets")
+}
+class D4CRpcClient {
+    Map<CommStatus, Status> STATUS_MAPPING;
+
+    SessionProgressStatus retrieveSessionStatus(String sessionDir)
+}
+}
+@enduml

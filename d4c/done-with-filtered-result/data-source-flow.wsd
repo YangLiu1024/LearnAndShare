@@ -1,0 +1,11 @@
+@startuml filtered-data-source-flow
+(*) --> Load result
+
+if "Has Filtered Results" then
+    --> [Yes] add transition
+    --> (*)
+else
+    --> [No] (*)
+
+endif 
+@enduml

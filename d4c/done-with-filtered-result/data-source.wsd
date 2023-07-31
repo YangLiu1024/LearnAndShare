@@ -1,0 +1,55 @@
+@startuml filtered-data-source
+
+interface FilteredPatternDataSource {
+    + boolean hasResult();
+}
+
+class FilteredMarkDataSourceImpl {
+
+}
+
+class FilteredTargetDataSourceImpl {
+
+}
+
+note left of FilteredPatternDataSource
+add a new method to check
+end note
+FilteredMarkDataSourceImpl --|> FilteredPatternDataSource
+FilteredTargetDataSourceImpl --|> FilteredPatternDataSource
+
+abstract class AnalysisBaseModel {
+    + boolean hasFilteredResult()
+}
+
+class AlAnalysisModel {
+
+}
+
+class AnalysisOutputModel2 {
+
+}
+
+FilteredPatternDataSource ..> AnalysisBaseModel
+AlAnalysisModel --|> AnalysisBaseModel
+AnalysisOutputModel2 --|> AnalysisBaseModel
+
+class AnalysisController {
+    +void loadData()
+}
+
+class AlAnalysisController {
+    - Button filteredMarkBtn
+}
+
+class OvlAnalysisController {
+    - Button filteredTargetBtn
+}
+
+note right of AnalysisController
+when loda data, add transition to button
+end note
+AnalysisBaseModel ..> AnalysisController
+AlAnalysisController --|> AnalysisController
+OvlAnalysisController --|> AnalysisController
+@enduml
