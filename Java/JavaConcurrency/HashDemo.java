@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HashDemo {
 
@@ -13,6 +14,7 @@ public class HashDemo {
     public static void main(String[]args) {
         HashDemo d1 = new HashDemo();
         HashDemo d2 = new HashDemo();
+        map = new ConcurrentHashMap();
         System.out.println(d1.hashCode() + ", " + d2.hashCode() + d1.equals(d2));
         HashSet<HashDemo> sets = new HashSet<>();
         sets.add(d1);

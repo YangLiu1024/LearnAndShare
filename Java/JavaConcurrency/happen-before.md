@@ -37,8 +37,15 @@ public class Demo {
 ```
 volatile 自己本身的语义保证了对该变量的写，一定对后续对该变量的读可见。所以当线程 A 执行 write 方法，线程 B 执行 read 方式，且线程B 检测到 flag 为 true 时， 表示 A 一定已经执行完了 write 方法。根据程序顺序规则，1 happen before 2, 3 happen before 4, 又 2 happen before 3, 那么 1 一定 happen before 4, 所以在执行 4 的时候，a 一定已经为更新之后的值。这就保证了A　线程在写 volatile 变量之前所有可见的共享变量，在 B 线程读同一个 volatile 变量之后，都立即变的对 B 线程可见。  
 
+volatile 本身的特性就是相当于对一个变量的读写加锁，根据锁的 happen before 原则，前面对该变量的写总是对后续对该变量的读可见。  
+同样，锁的语义也决定了临界区代码的原子性，这就意味着，即使是对 long/double 类型的变量读写，只要它是 volatie, 对该变量的读写就具备原子性。  
+
+volatile 的用处不在于它本身的特性，在于它对内存可见性的影响，通过 volatile 实现线程之间的通信，如上例所示。  
+当一个 read 线程检查到 flag 为 true 时, 那么根据 happen before 原则， write 线程对共享变量 a 的修改就一定对 read 线程可见
+
 ## 锁
-类似的，锁除了可以让临界区互斥执行外，还可以让释放锁的线程向获取同一个锁的线程发送消息。
+类似的，锁除了可以让临界区互斥执行外，还可以让释放锁的线程向获取同一个锁的线程发送消息。  
+锁和 volatile 具备类似的内存语义，在一个线程释放锁后，该线程对共享变量的改变，一定会对之后获取该锁的线程可见。  
 ```java
 class Demo {
     int a = 0;
@@ -100,3 +107,54 @@ public class Demo {
 }
 ```
 以上代码就有可能导致在一个线程执行构造器的时候，还没有结束，其它线程就可以检测到 obj 已经不为 null, 从而访问 obj 的数据，但这个时候 final 域可能还没有初始化，因为 i= 1 与 obj=this 可能被重排序。
+
+## 双重检查锁定和延迟初始化
+
+```java
+public class Test {
+    private static Test instance;
+
+    // 这个是最简单的实现，但是有明显的错误，即在多线程条件下，很有可能一个线程执行到 #1 的时候，另一个线程执行到 #2.
+    // 导致在不同的线程都创建了实例
+    public static Test getInstance() {
+        if (instance == null) { //1
+            instance = new Test()//2
+        }
+        return instance;
+    }
+
+    // 一个简单的 fix 就是加上 锁，但是如果 getInstance 被频繁调用，那么就会导致较大性能损耗
+    public synchronized static Test getInstance() {
+        if (instance == null) { //1
+            instance = new Test()//2
+        }
+        return instance;
+    }
+
+    // double check
+    public static Test getInstance() {
+        if (instance == null) {//1 实例在初始化完成之后，所有的 get 都不再需要加锁
+            synchronized(Test.class) {
+                if (instance == null) { //2 这里必须再检查一次，否则有可能多个线程都通过了 #1
+                    instance = new Test()
+                }
+            }
+        }
+        return instance;
+    }
+
+    // 上述的 double check 还存在一定的风险，这是因为 instance = new Test() 这条语句其实对应多条操作，这些操作可能会被重排序
+    // 比如 JVM 可能在分配内存后，先把引用赋给  instance, 然后再执行 instance 的初始化。 这就导致有可能另外的线程在执行 #1 时，发现 instance 不是 null, 然后去使用它，但是实际上该对象还没有执行初始化代码
+    // 为了解决这个问题，可以将 instance 标记为 volatile. volatile 会禁止 instance = new Test() 的重排序
+    // 当然，更好的方式是使用 内部 holder 的形式
+
+    static final class TestHolder {
+        public static Test INSTANCE = new Test()
+    }
+    // JVM 保证类的初始化过程的同步
+    public static Test getInstance() {
+        return TestHolder.INSTANCE;
+    }
+
+}
+```
