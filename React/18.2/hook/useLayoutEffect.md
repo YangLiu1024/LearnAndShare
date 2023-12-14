@@ -1,5 +1,7 @@
 # useLayoutEffect
 `useLayoutEffect(setup, deps?)` 是为了能够 measuring layout before browser repaints the screen. 也就是说，该 hook 会 block browser repaints.  
+useLayoutEffect 是在 浏览器重新渲染 DOM 之前执行的 hook, 在该 hook 函数体执行时，以及函数体内状态的更新，都会阻止浏览器渲染 DOM.  
+
 它的使用场景在于，有的时候，控件在渲染的时候，需要知道它的位置和大小。  
 比如 tooltip, tooltip 在渲染的时候，需要知道它所 hover 元素的位置，以及它自己的大小，这样才能知道，tooltip 到底应该渲染在 hover 元素的什么位置
 ```js
@@ -71,3 +73,6 @@ export default function TooltipContainer({ children, x, y, contentRef }) {
 }
 
 ```
+上述代码值得注意的地方在于，tooltip 其实被渲染了两次，第一次是 height = 0 的时候，第二次是 useLayoutEffect 里真实探知到的 height.  
+但用户只能观察到最终结果，因为 useLayoutEffect 会阻止浏览器渲染 DOM
+
