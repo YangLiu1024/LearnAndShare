@@ -116,3 +116,33 @@ function Person() {
 }
 new Person();
 ```
+箭头函数的 this 总是在创建箭头函数的时候就会和当前上下文里的 this 绑定
+```js
+const a = {
+    x: 1,
+    f: () => {
+        // 在创建 f 这个箭头函数时，其上下文中的 this 是全局变量 window, 所以 this 会绑定在 window 上
+        return this.x
+    }
+}
+
+function f() {
+    return () => {
+        // 这里的 this 会根据 f 的调用者来绑定
+        // f() 就会绑定在 window, a.f() 就会绑定在 a
+        return this;
+    }
+}
+
+class Person {
+    // 普通的函数，this 绑定在调用者
+    f1() {
+        return this
+    }
+
+    // f2 会在每次创建对象时新建，即每个对象的 f2 都是新建的，且 this 会绑定在 新建的对象上
+    f2 = () => {
+        return this
+    }
+}
+```

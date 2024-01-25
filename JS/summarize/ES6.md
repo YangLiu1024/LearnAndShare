@@ -237,3 +237,7 @@ const proxy = new Proxy(person, {
 ```js
 void observe<T>(target: T, keys, handlers);
 ```
+
+# Transpilers & Polyfills
+转译器用于将某一个版本的 JS 转换为其它版本的 JS, 比如 Babel, 将 ES6 转换为更老的 版本以使老版本的 浏览器也可以执行 JS 代码。  
+Polyfills 是表示当代码里使用了老版本没有的内置函数时，需要使用 polyfill 将新的内置函数添加到老版本 JS 里。  

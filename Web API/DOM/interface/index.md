@@ -55,7 +55,7 @@ TextDecoder 表示一个文本解码器，一个解码器只支持一种特定�
 
 # TextEncoder
 TextEncoder 是一个编码器，将码位流编码为 utf8 字节流
-* encode(string) => 将字符串编码为 utf8 字节流
+* encode(string):Uint8Array => 将字符串编码为 utf8 字节流
 * encodeInto(string, unit8Array) => 将编码结果存入指定 unit8Array
 
 需要注意的是，在将字符转换为字节时，每一个字符至少需要一个字节，比如英文字符，中国字符需要 3个字节，有的表情包还需要 4个字节

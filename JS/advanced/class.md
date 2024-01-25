@@ -147,6 +147,7 @@ class A {
 }
 ```
 # inherit
+类的 继承会包括 类本身的继承，以及类对象方法的继承。
 ```js
 class A {
     static a = 1
@@ -166,6 +167,11 @@ class A {
     }
 }
 
+// B extends A 会导致 
+// 1. B.__proto__ === A => B 可以访问 A 的静态方法
+// 2. B.prototype.__proto__ === A.prototype => B 的对象可以访问 A 里面定义的成员函数
+
+// 但是这里需要注意的是，内建类虽然都继承自 Object, 但是内建类并没有继承 Object 的静态方法，这是内建类的特殊地方
 class B extends A {
     static b = 2;
     z;

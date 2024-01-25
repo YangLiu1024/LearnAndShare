@@ -100,6 +100,18 @@ function Child() {
 
 ## typeof
 typeof 检查参数类型比较局限，对于对象类型，只能区分 object 和 function
+
+## Object.prototype.toString
+Object.prototype.toString 是增强版的 typeof, 不仅能识别基础类型，函数，还能识别内置类型
+```js
+const toString = Object.prototype.toString
+
+toString.call(new Date()) // [Object Date]
+toString.call(1) // [Object Number]
+toString.call(null) // [Object Null]
+toString.call() // [Object Undefined]
+toString.call({}) // [Object Object]
+```
 ## instanceof
 instanceof 实际上就是检查原型链
 ```js
@@ -135,4 +147,65 @@ Foo instanceof Foo// false
 
 // String 是函数对象 String.__proto__ === Function.prototype
 String instanceof String
+```
+
+# 属性修饰符
+JS 里对象的属性其实都是有隐式的配置的，这些配置包含
+```js
+{
+    value?: any,
+
+    configurable?: boolean // 属性的配置是否可修改，可删除。如果是 false, 则表示该属性 enumerable 不可改，且该属性不可被删除，writable 只能从 true 改为 false
+    enumerable?: boolean // 属性是否可枚举
+    writable?: boolean // 属性是否可改
+
+    set?(v: any):void
+    get?():any
+}
+// 定义对象的属性配置
+Object.defineProperty(obj, name, {
+
+})
+
+Object.defineProperties(obj, {})
+
+// 获取对象属性的描述符
+Object.getOwnPropertyDescriptor(obj, name)
+Object.getOwnPropertyDescriptors(obj)
+```
+
+对于 class 类上定义的 getter, setter, 其实也是有描述符的, 只是该属性是属于类，而不是实例
+```js
+class Person {
+    firstName = '';
+    lastName = '';
+
+    get fullName() {
+
+    }
+}
+
+Object.getOwnPropertyDescriptor(Person.prototype, 'fullName');
+
+{
+    configurable: true,
+    enumerable: false,
+    get(){},
+    set: undefined,
+}
+```
+我们怎么快速安全的 copy 一个对象呢？copy 一个对象，不仅仅是需要 copy 这个对象自己 own 的属性，还需要继承它的原型链
+```js
+const a = {
+    x: 1,
+    y() {
+        return this.x + 1;
+    }
+}
+
+function clone(obj) {
+    // 首先，新建的对象会和  obj 拥有相同的 __proto__, 那么就继承了原型链
+    // 其次，把 obj 所有的 own 的 property descriptor 也传递给新建的对象
+    return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj))
+}
 ```
