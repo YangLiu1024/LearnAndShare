@@ -1,7 +1,7 @@
 # observable 
 observable 是 mobx 最核心的概念， 如果一个变量被声明为 observable, 那么它的值将会被监测，当值发生改变，就会触发对应的 reactions.   
 在此基础上，也衍生了一些其它的概念，比如说 *computed*, 计算属性，即该属性是通过其它属性计算得来，和 react useMemo 类似。  
-然后 mobx 的状态更新，都需要被包装在一个 *action* 里面  
+然后 mobx 的状态更新，都需要被包装在一个 *action* 里面. action 对状态的改变是原子性的，在 action 完成之前，外部感知不到状态的变化。    
 
 那么怎么创建这些可观测对象呢？ mobx 提供了几种方法
 * makeObservable(target, annotions?, options?)  
@@ -82,7 +82,9 @@ todosById["TODO-456"] = {
 const tags = observable(["high prio", "medium prio", "low prio"])
 tags.push("prio: for fun")
 ``` 
-*observable* 和其它两种方式的区别在于，observable 会复制 source 对象，返回一个 proxy 副本对象，而 makeObservable/makeAutoObservable 都是在原对象上进行修改进而达到监控。  
+*observable* 和其它两种方式的区别在于，
+* observable 会复制 source 对象，返回一个 proxy 副本对象，而 makeObservable/makeAutoObservable 都是在原对象上进行修改进而达到监控。 
+* observable 是创建一个 Proxy 对象，以遍能够监控添加/删除字段，使新添加的字段也成为可观察的属性 
 
 # options
 上述的 api 都支持 *options* 配置, 但 autoBind/deep 一般都只在 makeAutoObservable 里使用，因为 makeObservable 本身就要求显示使用 annotations，那么 options 就对这些显示指定注解的 field 不起作用。
@@ -108,8 +110,96 @@ tags.push("prio: for fun")
 | *override* | 用于子类覆盖继承的 action/flow/computed/action.bound |
 | *autoAction* | 不应被显示调用 |
 
+```js
+// 测试一下 observable.ref/shallow/struct 的使用
+const source = () => ({
+  x: 1,
+  y: {
+    z: 2
+  },
+  flag: false,
+
+  items: [] as {value: number}[],
+
+  changeX() {
+    this.x++;
+  },
+
+  changeY() {
+    this.y = {z: this.y.z}
+  },
+
+  changeZ() {
+    this.y.z = this.y.z + 1;
+  },
+
+  toggle() {
+    this.flag = !this.flag;
+  },
+
+  addItem() {
+    this.items.push({value: Math.random()});
+  },
+  replaceItem() {
+    this.items[0] = {value: Math.random()};
+  },
+  updateItemValue() {
+    this.items[0].value = 100;
+  },
+
+  get sum() {
+    return this.x + this.y.z;
+  }
+})
+    const target = makeObservable(source(), {
+      x: observable,
+      changeX: action.bound,
+      y: observable.ref,
+      changeY: action.bound,
+      changeZ: action.bound,
+      items: observable.shallow,
+      addItem: action.bound,
+      replaceItem: action.bound,
+      updateItemValue: action.bound,
+    });
+    autorun(() => {
+      console.log('make observable x ', target.x, ' z ', target.y.z, ' items ', target.items.map(v => v.value).join(','));
+    });
+    const {
+      changeX,
+      changeY,
+      changeZ,
+      addItem,
+      replaceItem,
+      updateItemValue,
+    } = target;
+    changeX();
+    // 当使用 observable.struct 时，changeY 并不会触发 autorun, mobx 会认为该对象没有变化. 如果使用 observable.ref, 则会触发
+    changeY();
+    // 不管使用 observable.struct 还是 observable.ref, 改变 z 都不会触发 autorun, 因为 此时的 observable 并不是 deep 的，那么底层的改动，并不会触发 autorun
+    changeZ();
+    // observable.shallow 可以监测集合对象 添加/删除 元素， 以及整个元素的变化，但是监测不了元素内部的变化
+    // 所以 addItem 和 replaceItem 都会触发 autorun, 但是 updateItemValue 因为是更新内部的值，所以并不会被感知
+    addItem();
+    replaceItem();
+    updateItemValue();
+```
 # 局限性
 * make(Auto)Observable 仅支持 target 已经定义的属性，确保在调用 make(Auto)Observable 之前，所有属性都已经被赋值。如果没有正确配置，已经声明，但是没有初始化的属性，并不会被正确侦测到
+* makeAutoObservable 只能在基类中使用，且不能有子类
 * makeObservable 只能注解由它自己声明的属性，每个字段只能被注解一次(除了 override)。
 * 父类的 action,action.bound, computed, flow 可以被子类 覆盖
 * 尽量不使用继承，多使用组合。
+
+```js
+class Timer {
+    time
+
+    constructor(time) {
+        // 如果在调用 makeAutoObservable 之前，属性并没有被初始化， 那么该属性并不会被转化为可观测属性
+        makeAutoObservable(this, {})
+        this.time = time;
+    }
+
+}
+```

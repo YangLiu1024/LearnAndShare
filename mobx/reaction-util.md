@@ -42,9 +42,45 @@ reaction 函数都有一个 options, 该 options 可以用来进一步定制 rea
 
 # 规则
 
-1. 如果可观测对象状态发生变化，那么该对象的 reactions 会在当前 action（如果嵌套在 action 里，那么会在最外层 action ） 执行结束后开始同步运行(mobx 并不保证运行顺序)
+1. 如果可观测对象状态发生变化，那么该对象的 reactions 会在当前 action（如果嵌套在 action 里，那么会在最外层 action ） ***执行结束后*** 开始同步运行(mobx 并不保证运行顺序)
 2. autorun 只会跟踪在在 effect 里同步执行过程中读取的可观测对象，不会跟踪异步执行过程中的可观测对象
 3. autorun 不会跟踪在 effect 里调用的 action 中读取的可观测对象， action 
 4. 传递给 reaction, autorun, when 的 effect 函数，只会在它所观察的所有可观测状态都 GC 之后，才会被 GC. 为了自动 GC, 它们都会返回一个 disposer 函数，调用该函数，可以取消订阅
 5. reaction 不应该在 effect 函数里调用 action, 它只是用来触发副作用。而且，一般只在引起状态变化的一方和副作用的效果没有直接联系时，才会使用 reaction.
 6. reaction 之间应该是 独立 的，不能有依赖关系，因为 reaction 的触发是不保证先后顺序的
+
+```js
+    const target = observable({
+      x: 1,
+      y: 2,
+      changeX() {
+        this.x++;
+      },
+      changeY() {
+        this.y += 2;
+      },
+    });
+    // 代码执行到这里，await 1 会立即执行，但是之后的代码会进入微任务队列。这里同步过程中，只访问了 target.x
+    // queue: [await 1]
+    autorun(async () => {
+      console.log('ax', await target.x);
+      console.log('ay', await target.y);
+    })
+    // 代码执行到这里，同步打印 x1, y2
+    autorun(() => {
+      console.log('x', target.x);
+      console.log('y', target.y);
+    })
+    // 这改变了 x 的值，触发第一和第二个 reaction. 
+    // 第一个 reaction 往 微任务队列里继续添加， queue: [await 1, await 2]
+    // 第二个 reaction 打印 x2, y2
+    target.changeX();
+    // 这里改变了 y 的值，因为 第一个 reaction 依赖项并没有捕获到 y, 所以第一个 reaction 并不会触发
+    // 第二个 reaction 触发，打印 x2, y4
+    target.changeY();
+
+    // 最后开始执行微任务队列中 第一个 await 1
+    // 打印 ax1, 然后微任务队列添加 task [await 2, await 4]
+    // 处理第二个 await 2, 打印 ax2, 添加 task [await 4, await 4]
+    // 继续处理，打印 ay4, ay4
+```

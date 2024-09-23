@@ -1,4 +1,7 @@
 # Readme
+mobx 类似于 redux, 定义了 可观测对象 observable，以及改变对象属性的 action, 派生属性 computed, 等等。  
+在进行组件渲染时，在使用 *observer* wrap 组件后，mobx 可以自动监测到该组件使用的所有可观测对象，在可监测对象改变时，触发重新渲染。  
+mobx 的 observable 就替代了 useState, action 就类似 state dispatcher 或者 useCallback, computed 就类似于 useMemo  
 
 # 将对象转换为可观测对象
 ## makeObservable(target, annotations, options)
