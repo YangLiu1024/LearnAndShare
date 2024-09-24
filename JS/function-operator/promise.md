@@ -33,7 +33,7 @@ promise.then(data => {}).catch(error => {}) //equal to promise.then(onFulfilled,
 * 每一个 catch 都只会尝试抓住它之前的操作的 error，如果执行到它时没有 error 发生，那么这个 catch 就会被跳过。
 * 如果在 then 里面 return 一个返回值，当这个返回值是 promise 对象，则会直接返回，且后续的回调需要等待该返回值状态改变，如果不是，则会将返回值包裹成一个新的 promise 对象，且状态为 fulfilled,之后的回调函数会立即执行
 
-## Promise all/race
+## Promise all/race/any/allSettled
 Promise.all 方法将多个 promise 包裹成一个新的 promise 实例。
 ```js
 var p = Promise.all([p1,p2,p3])//p1,p2,p3 is promise object
@@ -47,6 +47,25 @@ var promises = [1,2,3,4,5].map(i => return axios(i));
 
 Promise.all(promises).then(datas => {}).catch(err => {})
 ```
-race 和 all 类似，都是把多个 promise 对象包裹成一个新的 promise 对象，区别在于，race 的 promises 中，只要有一个状态发生变化， p 的状态就跟着变化。
-
+race 和 all 类似，都是把多个 promise 对象包裹成一个新的 promise 对象，区别在于，race 的 promises 中，race 的状态总是由数组中第一个敲定的状态决定。  
 当 all/race 方法参数里包含不是 promise 的参数，则会调用 Promise.resolve(param) 尝试把 param 转换为 promise对象。如果该参数不具有 then 方法, 则将它直接包裹在 fulfilled 的 promise 对象里返回，对于 race, 后续的回调会直接执行，对于 all, 则还需要等待其它 promise 参数。
+
+数组元素都是同步一起执行的, 比如 Promise.all([p1, p2, p3]), p1, p2, p3 是同步开始执行的
+
+* all 是等待数组所有元素 fulfiled, 如果有一个 promise rejected, 则 reject. 如果数组为空，则返回 fulfilled promise. 如果不为空，则先返回 pending promise.
+* race 是竞争关系，返回的 promise 状态由第一个敲定状态的 promise 决定。如果数组为空，那么 返回的 promise 状态会一直是 pending, 如果不为空，不管元素状态是不是 settled, 首先返回 pending 的 promise, 之后再根据第一个 settled 的 promise 敲定状态。
+* allSettled 是等待数组所有元素敲定状态。如果数组为空，则返回 fulfilled promise, 否则返回 pending promise first. 最后的结果是所有 元素的结果的数组，结果类型为 {status: 'fulfilled' | 'rejected', value?: any, reason?: any}
+* any 是等待数组中某一个元素 fulfilled, 直到所有元素都 reject. 如果数组为空，则直接返回 rejected promise. 如果最后所有元素都 reject, 则返回一个 AggregateError
+一个比较奇妙的用法是使用 race 检查 promise 的状态
+```js
+function promiseState(promise) {
+  const pendingState = { status: "待定" };
+
+  // Promise.race 会找到第一个 settled 的 promise, 如果 promise 已经 settled, 则 value 将会是 promise 的 value, 否则 value 将会是 pendingState
+  return Promise.race([promise, pendingState]).then(
+    (value) => (value === pendingState ? value : { status: "已兑现", value }),
+    (reason) => ({ status: "已拒绝", reason }),
+  );
+}
+
+```

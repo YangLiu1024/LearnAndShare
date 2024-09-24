@@ -17,7 +17,9 @@ async 用来标记一个函数为 async 函数，await 用于等待 async 函数
 宏任务和微任务的区别就在于，当主线程执行完当前代码时，会切换到任务队列，且每次在切换到任务队列的时候，都会优先处理微任务队列，只有当微任务队列为空时，才会处理宏任务队列。  
 需要注意的是，所有任务都是在主线程完成，当主线程和任务队列都为空时，程序结束。当在执行任务时增加了新的任务，则会添加到对应的任务队列中。  
 
-# 执行顺序
+不需要在意执行顺序，只需要知道机制就行，底层实现不需要细究
+
+<!-- # 执行顺序
 ## ***await expression***
 <s>await 总是会把后续代码添加到微任务队列，区别在于当 expression 的 类型不一样时，该 await 等待的时间不一样
 1. 如果 expression 是 一个确切的值，比如 1，undefined, 无需等待
@@ -86,6 +88,16 @@ Promise.resolve()
 // 5
 // 7
 // 6
+
+// 执行 test, 首先打印 1， 然后进入 await 后的表达式，该表达式是一个 thenable, 类似于一个 Promise.resolve().then(() => {}), 所以 then(cb) 的函数体进入微任务队列
+// 然后打印 3， then4 进入队列
+// 处理 then(cb), 打印 'execute thenable', thenable 是 fullfiled，外面还有 await, await thenable 进入队列
+// 打印 4， then5 进入队列
+// 打印 2， then7 进入队列
+// 打印 5， then6 进入队列
+// 打印 7， 打印 6
+// 所以 await thenable 其实就相当于 await Promise.resolve().then(() => {}), 需要先执行 这个 promise 里面的内容，等到它 fullfiled, 还需要 进入外面等待的那个 await
+// BTW， TS 现在对于 await thenable 会报错 'Type of 'await' operand must either be a valid promise or must not contain a callable 'then' member'
 async function test() {
     console.log(1)
     await {
@@ -108,6 +120,11 @@ Promise.resolve()
 ### case3 await promise
 ```js
 // 1 3 2 4 7 5 6
+// 打印 1， 进入 promise 函数体，该 promise 直接 resolve, 进入 fullfiled 状态，外面是 await, 进入队列
+// 打印 3， then4 进入队列
+// 打印 2 ...
+
+// await 后面的 promise, 就会一直执行，直到 fullfiled. fullfiled 后，和外部的 await 进入微任务队列
 async function test() {
     console.log(1)
     await new Promise((resolve) => {
@@ -127,6 +144,7 @@ Promise.resolve()
 ### case4 await async 函数返回确切值
 ```js
 // 1 3 2 4 7 5 6
+// 和上述案例类似，func 函数返回的是 Promise.resolve(1), 则和外部的 await 进入微任务队列
 async function func() {
     return 1
 }
@@ -148,6 +166,13 @@ Promise.resolve()
 ### case5 await async 函数返回 thenable
 ```js
 // 1 3 4 2 5 7 6
+// 打印 1， func 返回的相当于是 Promise.resolve().then(cb), then(cb) 进入队列
+// 打印 3, then4 进入队列
+// then(cb) 执行结束后，promise fullfiled, await func 进入微队列
+// 打印 4， then5 进入队列
+// 打印 2， then7 进入队列
+// 打印 5， then6 进入队列
+// 打印 7， 打印 6
 async function func() {
     return {
         then(cb) {
@@ -176,11 +201,13 @@ Promise.resolve()
 // 3 [await-p then4]
 // [then4 await-p]
 // 4 [await-p then5]
-// [then5 await-p]
-// 5 [await-p  then6]
+// [then5 await-2]
+// 5 [await-2  then6]
 // 2 [then6 then7]
 // 6
 // 7
+
+// 当 async 函数返回 promise 时，它的底层实现会创建一个新的 pending promise, 原始 promise 的状态同步到新的 pending promise 会需要两个 任务周期
 async function func() {
     // 返回的 promise 已经 settled
     return Promise.resolve()
@@ -215,6 +242,15 @@ Promise.resolve()
 // 10
 // 7
 // 11
+
+// 1，[then8], 'after func', [then8]
+// 3, [then8, then4]
+// 8, [then4, then9]
+// 4, [then9, then5]
+// 9, [then5, promise-pending]
+// 5 [promise-pending, then6]
+// [then6, then2]
+// 6
 async function func() {
     const p = Promise.resolve()
         .then(() => console.log(8))
@@ -334,7 +370,7 @@ async function async1() {
     await async2();
     console.log('AAA')
 }
-
+// async2 返回的是 settled promise, 那么后续的 thenAAA 就需要等待两个 then
 async function async2() {
     console.log(3)
     return new Promise((resolve) => {
@@ -783,3 +819,10 @@ Promise.resolve()
             .then(() => console.log(4))
                 .then(() => console.log(5))
 ```
+
+Conclusion:
+* 所以只要 async function 返回的是 settled Promise, 那么回到外部调用，需要等待两个 task
+* 如果返回的是 unsettled 的 promise, 则需要等待一个 task
+* 如果返回的是 确定值，则不需要等待
+* 如果返回的是 thenable, 则先把 thenable 的 then 推入队列，然后无需等待
+* 如果返回的是另外的 function, 则进入 function 继续执行 -->
