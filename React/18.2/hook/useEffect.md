@@ -40,6 +40,10 @@ effect 的生命周期和组件挂钩，但侧重点不太一样。effect 是针
 3. 当组件卸载时，会先执行父组件的 effect 清理函数 => 子组件的清理函数
 4. 同一组件中的不同 effect, 则按照声明顺序就行调用
 
+## useEffect 调用
+组件挂载时，所有组件里面的所有 useEffect 都会调用一次回调函数。对于组件本身，回调函数按照声明顺序从上往下执行。对于父子组件，子组件的 effect 回调会优先于 父组件的 effect 回调执行。如果是开发模式下的 *StrictMode*, React 还会对挂载的组件默认执行一次 unmount + mount. 即卸载再挂载一次。这种情况下，是会先执行子组件的 effect cleanup 回调，再执行父组件的 cleanup 回调。接着执行 子组件的 effect 回调，最后是父组件的 effect 回调。  
+当状态发生改变，则只有依赖于该状态的 effect 回调会被执行，且也是子组件优先于父组件。  
+当组件卸载时，会***先执行父组件的 cleanup 回调，再执行子组件的 cleanup***
 ```js
 import {useState, useEffect, useCallback} from 'react';
 // 当组件挂载时，会先执行 Child2 的 effect 函数，接着 Child1 的 effect 函数，最后是 App 的 effect 函数

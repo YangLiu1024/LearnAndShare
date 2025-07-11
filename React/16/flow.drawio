@@ -1,0 +1,136 @@
+<mxfile host="65bd71144e">
+    <diagram id="2IdY0AixdPA1L3FspNxm" name="Page-1">
+        <mxGraphModel dx="2095" dy="953" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="55" value="被 schduleCallback 和 workLoop 在 taskQueue empty 时触发" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.text.stickyNote2;fontColor=#666666;mainText=;fontSize=10;whiteSpace=wrap;fillColor=#ffffcc;strokeColor=#F62E00;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="100" y="160" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="添加一个 零延时宏任务" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.text.stickyNote2;fontColor=#666666;mainText=;fontSize=10;whiteSpace=wrap;fillColor=#ffffcc;strokeColor=#F62E00;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="350" y="381" width="135" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="2" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="requestHostCallback" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="350" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="schedulePerformWorkUtilDeadline" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="260" y="350" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;ol&gt;&lt;li&gt;setImmediate&lt;/li&gt;&lt;li&gt;MessageChannel&lt;/li&gt;&lt;li&gt;setTimeout&lt;/li&gt;&lt;/ol&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;spacing=0;" vertex="1" parent="1">
+                    <mxGeometry x="270" y="270" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="performWorkUtilDeadline" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="580" y="350" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="6">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="487.5" y="435" as="sourcePoint"/>
+                        <mxPoint x="297.5" y="380" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="410" y="435"/>
+                            <mxPoint x="297.5" y="435"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="12" value="hasMoreWork = true" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="11">
+                    <mxGeometry x="0.0197" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="16" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="6">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="850" y="435" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="hasMoreWork = false" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="16">
+                    <mxGeometry x="-0.0679" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="48" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="6" target="18">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="flushWork" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="420" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" style="edgeStyle=none;html=1;entryX=0.563;entryY=0.039;entryDx=0;entryDy=0;exitX=0.563;exitY=0.983;exitDx=0;exitDy=0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="7" target="2">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="120" y="330" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="51" value="taskQueue 有 ready task" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="50">
+                    <mxGeometry x="0.05" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="handleTimeout" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="250" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="8" target="2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="unstable_scheduleCallback(&lt;div&gt;priorityLevel,&lt;/div&gt;&lt;div&gt;callback: Callback,&lt;/div&gt;&lt;div&gt;options?: {delay: number}&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry y="460" width="180" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="workLoop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="500" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Done" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="850" y="422.5" width="50" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;把 timerQueue 里面 ready 的 task 挪到 taskQueue&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;从 taskQueue 里面取出 task, 如果 task 不为 null&lt;/span&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;检测当前是否需要 yield to host, 如果需要(task 执行时间已经超过 frameInterval)，则 break&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;/blockquote&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;检查当前 task 的 callback,&amp;nbsp;&lt;/div&gt;&lt;/blockquote&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;如果不可执行，则直接 pop.&amp;nbsp;&lt;/div&gt;&lt;/blockquote&gt;&lt;/blockquote&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;如果可执行，则调用该回调。执行结束时，需要检查该回调的返回值。&lt;/div&gt;&lt;/blockquote&gt;&lt;/blockquote&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;如果返回值仍然是 函数，则将该 task 的回调更新为返回值，且直接以 true 作为返回值退出 work loop&lt;/div&gt;&lt;div&gt;如果不是，则表示 task 执行完毕，则弹出该 task, 然后以当前时间，重新&amp;nbsp; check 一下 timerQueue, 把 ready 的 task 挪出去&lt;/div&gt;&lt;/blockquote&gt;&lt;/blockquote&gt;获取下一个 task&lt;/blockquote&gt;如果 task 不为 null, 表示到达了 deadline, 需要 yield to host，且还有 task 没完成，return true&lt;div&gt;如果 task 为 null, 表示 taskQueue 清空，则尝试用 timerQueue schedule host timeout, return false&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;align=left;horizontal=1;labelPosition=center;verticalLabelPosition=middle;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="540" width="540" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="44" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="requestHostTimeout" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry y="180" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5" target="6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="startTime = currentTime + delay&lt;div&gt;expirationTime = startTime + timeout(computed from priorityLevel)&lt;/div&gt;&lt;div&gt;如果 startTime &amp;gt; currentTime, 表示当前 task 是 delayed task, 以 startIndex 为 sortIndex push 到 timerQueue&lt;/div&gt;&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;如果当前 taskQueue 为空，则取消当前 timeout, 然后从 timerQueue 重新 schedule timeout&lt;/div&gt;&lt;/blockquote&gt;反之，表示当前 task 应该以 expirationTime 压入 taskQueue&lt;div&gt;如果当前没有 schedule host callback, 且当前没有正在工作，则 request host callback&lt;/div&gt;" style="shape=note;size=20;whiteSpace=wrap;html=1;verticalAlign=top;align=left;" vertex="1" parent="1">
+                    <mxGeometry x="7" y="560" width="590" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.201;entryY=1.067;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="8" target="44">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" value="Tasks" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                    <mxGeometry x="510" y="170" width="140" height="90" as="geometry">
+                        <mxRectangle x="560" y="180" width="70" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="58" value="taskQueue: MinHeap" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="57">
+                    <mxGeometry y="30" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" value="timerQueue: MinHeap" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="57">
+                    <mxGeometry y="60" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="61" value="Task" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                    <mxGeometry x="690" y="170" width="350" height="140" as="geometry">
+                        <mxRectangle x="720" y="170" width="70" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="64" value="&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;id: number&lt;/span&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;callback: Callback | null&lt;/span&gt;&lt;br&gt;&lt;/div&gt;priorityLevel: &#39;Immediately&#39; | &#39;user block&#39; | &#39;normal&#39; | &#39;idle&#39; | &#39;low&#39;&lt;div&gt;startTime: number&lt;/div&gt;&lt;div&gt;expirationTime: number&lt;/div&gt;&lt;div&gt;sortIndex: number&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="61">
+                    <mxGeometry y="30" width="350" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="表示 taskQueue 被清空" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.text.stickyNote2;fontColor=#666666;mainText=;fontSize=10;whiteSpace=wrap;fillColor=#ffffcc;strokeColor=#F62E00;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="734" y="444" width="135" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" value="表示 taskQueue 还有任务，但是已经到了deadline" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.text.stickyNote2;fontColor=#666666;mainText=;fontSize=10;whiteSpace=wrap;fillColor=#ffffcc;strokeColor=#F62E00;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="330" y="444" width="135" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="74" value="setTimeout 有 0-4ms 的延迟" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.text.stickyNote2;fontColor=#666666;mainText=;fontSize=10;whiteSpace=wrap;fillColor=#ffffcc;strokeColor=#F62E00;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="410" y="280" width="180" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

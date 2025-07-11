@@ -132,3 +132,54 @@ path.closePath()
 path.toString(),//return the string represention of this path
 ```
 
+
+# viewbox & viewport
+先看一个最简单的例子, svg 设置了宽度，高度，但不设置 viewBox
+```html
+<!-- 这里 svg 和 rect 都是使用的 px 单位-->
+<!-- svg 大小是 500 x 200，rect 是从 20,10 开始，大小为 10，5 矩形，如下图所示-->
+<!-- 可见矩形是很小的-->
+<svg width="500" height="200">
+    <rect x="20" y="10" width="10" height="5"
+          style="stroke: #000000; fill:none;"/>
+</svg>
+```
+![](./images/svg-no-viewbox.png)
+
+```html
+<!-- 在设置 viewBox = "0 0 50 20" 后，即表示 svg 原本 0，0，500，200 的坐标系，在底层其实是使用 0 0 50 20-->
+<!-- 换句话说，svg 内部的元素，它每一个 unit，在 x 方向， 其实是对应着 500 / 50，即 10 个 pixel, 在高度上，每一个单位对应着 200 / 20， 即 10 个 pixel -->
+<!-- 对于 rect 来说，其起点则变成 200， 100， 宽度也变成 100， 高度变成 50 pixel-->
+<svg width="500" height="200" viewBox="0 0 50 20">
+    <rect x="20" y="10" width="10" height="5"
+          style="stroke: #000000; fill:none;"/>
+</svg>
+```
+![](./images/svg-with-viewbox.png)
+```html
+<!-- 对于 平移，它是相对于 用户坐标系而言的 -->
+<!-- 可以理解为先进行平移，再进行缩放-->
+<svg width="500" height="200" viewBox="10 10 50 20" >
+    <rect x="20" y="10" width="10" height="5"
+          style="stroke: #000000; fill:none;"/>
+</svg>
+```
+![](./images/svg-with-pan.png)
+如果设置了 viewBox, 但是不设置 viewport, 会发生什么呢？  
+首先 svg 在保持 viewBox 中 width/height ratio 的同时，会尽量占满可用空间, 在确定 svg viewport 的 width,height 后则和之前一样
+```html
+<svg viewBox="10 10 50 20" >
+    <rect x="20" y="10" width="10" height="5"
+          style="stroke: #000000; fill:none;"/>
+</svg>
+```
+
+## preserveAspectRatio
+如果 viewport 和 viewbox 的 aspect ration 不一样，那么就需要使用该属性来控制 svg 的渲染行为。  
+refer to ![Doc](https://jenkov.com/tutorials/svg/svg-viewport-view-box.html)
+
+## 总结
+如果不设置 viewBox, 那么 svg 内部元素就在 width 和 height 对应的坐标系下进行绘制，没有平移缩放。  
+设置 viewBox 后，首先根据 x, y 在坐标系下进行平移，然后根据 svg 的 viewport width,height 以及 viewbox 里的 width, height 的 ratio 进行缩放。  
+举例来说，如果 view port 是 200， 100， viewBox 是 50，20， 那么 svg 里元素的每个单位在 x 方向上相当于 200 / 50 = 4 个像素，在 y 方向上，每个单位相当于 100 / 20 = 5 个像素。图形进行了放大。  
+如果 viewBox 是 400，200， 那么每个单位则在 x 方向上相当于 200 / 400 = 0.5 个像素，在 y 方向上相当于 100 / 200 = 0.5 个像素，图形进行了缩小。 
