@@ -1,5 +1,5 @@
 # Qualify
-qualify 和 where, having 类似，都是用于 filter, 区别在于 qualify 是作用于 window function.
+qualify 和 where, having 类似，都是用于 filter, 区别在于 qualify 是作用于 window function. 且 qualify 的执行时机是在 where 和 having 之后。
 ```js
 SELECT
     schema_name,
